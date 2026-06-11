@@ -59,9 +59,9 @@ class NotificationService {
     final D = task.deadline.difference(DateTime.now()).inMinutes / 60.0;
     if (D > 0 && task.requiredHours > D && remaining > 0) {
       await _scheduleNotification(
-        id: _notificationId(task.id, 4),
+        id: _notificationId(task.id, 5),
         task: task,
-        state: TGLState.war,
+        state: TGLState.overdue,
         triggerTime: DateTime.now().add(const Duration(seconds: 2)),
         isHopeless: true,
       );
@@ -91,7 +91,7 @@ class NotificationService {
   }
 
   static Future<void> cancelNotificationsForTask(String taskId) async {
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 6; i++) {
       await _plugin.cancel(_notificationId(taskId, i));
     }
   }
