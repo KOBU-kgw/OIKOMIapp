@@ -1,0 +1,124 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "OIKOMI",
+
+  "taskListTitle": "Tasks",
+  "taskListEmpty": "No tasks. All clear.",
+  "addButton": "Add",
+  "saveButton": "Save",
+  "cancelButton": "Cancel",
+  "editTaskTitle": "Edit Task",
+  "addTaskTitle": "Add Task",
+
+  "taskNameLabel": "Task Name",
+  "taskNamePlaceholder": "e.g. Statistics essay, English quiz",
+  "taskNameRequired": "Please enter a task name",
+  "taskTypeLabel": "Task Type",
+  "deadlineLabel": "Deadline",
+  "timeAndAvoidanceLabel": "Time required / Avoidance",
+  "requiredTimeLabel": "Time required",
+  "avoidanceLevelLabel": "Avoidance",
+  "saveTaskButton": "Save",
+  "addTaskButton": "Add",
+  "doneButton": "Done",
+
+  "swipeEdit": "Edit",
+  "swipeComplete": "Done",
+  "swipeDelete": "Delete",
+
+  "taskTypeMiniReport": "Short Essay",
+  "taskTypeReport": "Essay",
+  "taskTypeQuizStudy": "Quiz Prep",
+  "taskTypePresentation": "Presentation",
+  "taskTypeFinalExam": "Final Exam",
+
+  "tglStatePeaceful": "All Good",
+  "tglStateSomeday": "Eventually...",
+  "tglStateReality": "Getting Real",
+  "tglStateNoEscape": "No Way Out",
+  "tglStateWar": "WAR",
+  "tglStateOverdue": "Overdue",
+
+  "notifSomeday": "Future you is crying right now",
+  "notifReality": "Time to face reality",
+  "notifNoEscape": "There's no escape now",
+  "notifWar": "It's war. That is all.",
+  "notifHopeless": "Already hopeless. Good luck.",
+  "notifChannelName": "Task Notifications",
+
+  "onboardingSkip": "Skip",
+  "onboardingPage1Heading": "Track deadline stress",
+  "onboardingPage1Body": "OIKOMI manages tasks by \"psychological difficulty\" — a new kind of task manager",
+  "onboardingPage2Heading": "Just 4 inputs",
+  "onboardingPage2Body": "Name, deadline, time required, and avoidance level. OIKOMI figures out the rest.",
+  "onboardingPage3Heading": "5-level stress display",
+  "onboardingPage3Body": "All Good → Eventually → Getting Real → No Way Out → WAR.\nYou get notified when the level changes.",
+  "onboardingPage4Heading": "Let's go",
+  "onboardingPage4StartButton": "Add your first task",
+
+  "onboardingMockTaskName": "Task Name",
+  "onboardingMockTaskValue": "Statistics essay",
+  "onboardingMockDeadline": "Deadline",
+  "onboardingMockDeadlineValue": "5/31 23:59",
+  "onboardingMockTime": "Time required",
+  "onboardingMockTimeValue": "2h",
+  "onboardingMockAvoidance": "Avoidance",
+  "onboardingMockAvoidanceValue": "7",
+
+  "timeUnitMinutes": "{count} min",
+  "@timeUnitMinutes": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "timeUnitHours": "{count}h",
+  "@timeUnitHours": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "timeUnitHoursMinutes": "{hours}h {minutes}min",
+  "@timeUnitHoursMinutes": {
+    "placeholders": {
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" }
+    }
+  },
+
+  "settingsTitle": "Settings",
+  "settingsSectionGeneral": "General",
+  "settingsNotifications": "Notifications",
+  "settingsLanguage": "Language",
+  "settingsLanguageValue": "Follow system",
+  "settingsSectionInfo": "Info",
+  "settingsVersion": "Version",
+  "settingsPrivacyPolicy": "Privacy Policy",
+  "settingsTermsOfService": "Terms of Service",
+  "settingsSupport": "Support",
+  "settingsUrlError": "Could not open URL",
+  "settingsSectionPremium": "Premium",
+  "settingsRestorePurchase": "Restore Purchase",
+  "settingsPremiumUpgrade": "Upgrade to Premium",
+  "settingsPremiumCustomThreshold": "Custom TGL Thresholds",
+  "settingsPremiumComingSoonTitle": "Coming Soon",
+  "settingsPremiumComingSoonBody": "Premium features will be added in a future update.",
+
+  "taskDetailTitle": "Task Detail",
+  "deleteButton": "Delete",
+  "completeButton": "Complete",
+  "undoButton": "Undo",
+  "taskDeletedMessage": "Task deleted",
+  "taskCompletedMessage": "Marked as complete",
+
+  "avoidance1": "No problem",
+  "avoidance2": "Pretty easy",
+  "avoidance3": "Can manage",
+  "avoidance4": "Kinda annoying",
+  "avoidance5": "Meh, fine",
+  "avoidance6": "Rather not",
+  "avoidance7": "Really don't wanna",
+  "avoidance8": "Please no",
+  "avoidance9": "Seriously, NO",
+  "avoidance10": "Over my dead body"
+}

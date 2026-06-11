@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
+import 'l10n/app_localizations.dart';
 import 'services/database_service.dart';
 import 'services/notification_service.dart';
 import 'screens/task_list_screen.dart';
@@ -27,6 +27,7 @@ Future<void> main() async {
 }
 
 Future<void> _onAppLaunch() async {
+  await DatabaseService.purgeStaleDeleted();
   final tasks = await DatabaseService.getAllIncompleteTasks();
   for (final task in tasks) {
     await NotificationService.scheduleNotificationsForTask(task);
@@ -42,14 +43,8 @@ class TGLApp extends StatelessWidget {
     return MaterialApp(
       title: 'OIKOMI',
       debugShowCheckedModeBanner: false,
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('ja'),
-      ],
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,

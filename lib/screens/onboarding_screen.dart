@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../l10n/app_localizations.dart';
 import 'task_form_screen.dart';
 import 'task_list_screen.dart';
 
@@ -36,6 +37,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -48,14 +50,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               _Page2(),
               _Page3(),
               _Page4(onStart: () async {
+                final navigator = Navigator.of(context);
                 await _completeOnboarding(context);
                 if (!context.mounted) return;
-                Navigator.pushReplacement(
-                  context,
+                navigator.pushReplacement(
                   MaterialPageRoute(builder: (_) => const TaskListScreen()),
                 );
-                Navigator.push(
-                  context,
+                navigator.push(
                   MaterialPageRoute(builder: (_) => const TaskFormScreen()),
                 );
               }),
@@ -67,7 +68,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             right: 16,
             child: TextButton(
               onPressed: () => _skip(context),
-              child: const Text('スキップ', style: TextStyle(color: Colors.grey)),
+              child: Text(l.onboardingSkip, style: const TextStyle(color: Colors.grey)),
             ),
           ),
           // ドットインジケーター
@@ -88,13 +89,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 class _Page1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return _PageLayout(
       visual: CustomPaint(
         size: const Size(180, 180),
         painter: _GaugePainter(progress: 0.7),
       ),
-      headline: '締切までの時間がわかる',
-      body: 'OIKOMIは"心理的つらさ"で課題を管理する、\n新しいタスク管理アプリ',
+      headline: l.onboardingPage1Heading,
+      body: l.onboardingPage1Body,
     );
   }
 }
@@ -104,10 +106,11 @@ class _Page1 extends StatelessWidget {
 class _Page2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return _PageLayout(
       visual: _FormMockVisual(),
-      headline: '入力はたった4つ',
-      body: '課題名・締切・所要時間・やりたくなさを\n入力するだけ。あとはOIKOMIが判断する',
+      headline: l.onboardingPage2Heading,
+      body: l.onboardingPage2Body,
     );
   }
 }
@@ -117,10 +120,11 @@ class _Page2 extends StatelessWidget {
 class _Page3 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return _PageLayout(
       visual: _StatusPillsVisual(),
-      headline: '5段階で"つらさ"を表示',
-      body: 'まだ平和 → そのうちヤバ → もうヤバ現実 →\n逃げ場なし → 戦争。\n状況が変わると通知でお知らせ',
+      headline: l.onboardingPage3Heading,
+      body: l.onboardingPage3Body,
     );
   }
 }
@@ -133,9 +137,10 @@ class _Page4 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return _PageLayout(
       visual: const SizedBox(height: 180),
-      headline: 'さあ始めよう',
+      headline: l.onboardingPage4Heading,
       body: '',
       action: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -155,7 +160,7 @@ class _Page4 extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            child: const Text('最初の課題を追加する'),
+            child: Text(l.onboardingPage4StartButton),
           ),
         ),
       ),
@@ -319,6 +324,7 @@ class _GaugePainter extends CustomPainter {
 class _FormMockVisual extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Container(
       width: 260,
       padding: const EdgeInsets.all(16),
@@ -337,15 +343,15 @@ class _FormMockVisual extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _MockField(label: '課題名', value: '統計学レポート'),
+          _MockField(label: l.onboardingMockTaskName, value: l.onboardingMockTaskValue),
           const SizedBox(height: 10),
-          _MockField(label: '締切', value: '5/31 23:59'),
+          _MockField(label: l.onboardingMockDeadline, value: l.onboardingMockDeadlineValue),
           const SizedBox(height: 10),
           Row(
             children: [
-              Expanded(child: _MockField(label: '所要時間', value: '2時間')),
+              Expanded(child: _MockField(label: l.onboardingMockTime, value: l.onboardingMockTimeValue)),
               const SizedBox(width: 8),
-              Expanded(child: _MockField(label: 'やりたくなさ', value: '7')),
+              Expanded(child: _MockField(label: l.onboardingMockAvoidance, value: l.onboardingMockAvoidanceValue)),
             ],
           ),
         ],
@@ -385,39 +391,46 @@ class _MockField extends StatelessWidget {
 // ─── ビジュアル: 5段階ステータスpill ────────────────────────────
 
 class _StatusPillsVisual extends StatelessWidget {
-  static const _states = [
-    ('まだ平和', Color(0xFFD4EDDA), Color(0xFF155724)),
-    ('そのうちヤバ', Color(0xFFFFF3CD), Color(0xFF856404)),
-    ('もうヤバ現実', Color(0xFFFFE0B2), Color(0xFFE65100)),
-    ('逃げ場なし', Color(0xFFFFCDD2), Color(0xFFC62828)),
-    ('戦争', Color(0xFFB71C1C), Colors.white),
+  static const _colors = [
+    (Color(0xFFD4EDDA), Color(0xFF155724)),
+    (Color(0xFFFFF3CD), Color(0xFF856404)),
+    (Color(0xFFFFE0B2), Color(0xFFE65100)),
+    (Color(0xFFFFCDD2), Color(0xFFC62828)),
+    (Color(0xFFB71C1C), Colors.white),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    final labels = [
+      l.tglStatePeaceful,
+      l.tglStateSomeday,
+      l.tglStateReality,
+      l.tglStateNoEscape,
+      l.tglStateWar,
+    ];
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: _states.map((s) {
+      children: List.generate(_colors.length, (i) {
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
             decoration: BoxDecoration(
-              color: s.$2,
+              color: _colors[i].$1,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              s.$1,
+              labels[i],
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
-                color: s.$3,
+                color: _colors[i].$2,
               ),
             ),
           ),
         );
-      }).toList(),
+      }),
     );
   }
 }
-

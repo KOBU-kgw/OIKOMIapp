@@ -26,10 +26,13 @@ class DatabaseService {
     });
   }
 
+  // ─── Task ─────────────────────────────────────────────────────
+
   static Future<List<Task>> getAllIncompleteTasks() {
     return _isar.tasks
         .filter()
         .isCompletedEqualTo(false)
+        .deletedAtIsNull()
         .findAll();
   }
 
@@ -47,8 +50,47 @@ class DatabaseService {
     final task = await getTaskByUuid(uuid);
     if (task == null) return;
     task.isCompleted = true;
+    task.completedAt = DateTime.now();
     await _isar.writeTxn(() async {
       await _isar.tasks.put(task);
+    });
+  }
+
+  static Future<void> undoComplete(String uuid) async {
+    final task = await getTaskByUuid(uuid);
+    if (task == null) return;
+    task.isCompleted = false;
+    task.completedAt = null;
+    await _isar.writeTxn(() async {
+      await _isar.tasks.put(task);
+    });
+  }
+
+  static Future<void> softDeleteTask(String uuid) async {
+    final task = await getTaskByUuid(uuid);
+    if (task == null) return;
+    task.deletedAt = DateTime.now();
+    await _isar.writeTxn(() async {
+      await _isar.tasks.put(task);
+    });
+  }
+
+  static Future<void> undoDeleteTask(String uuid) async {
+    final task = await getTaskByUuid(uuid);
+    if (task == null) return;
+    task.deletedAt = null;
+    await _isar.writeTxn(() async {
+      await _isar.tasks.put(task);
+    });
+  }
+
+  static Future<void> purgeStaleDeleted() async {
+    final stale = await _isar.tasks.filter().deletedAtIsNotNull().findAll();
+    if (stale.isEmpty) return;
+    await _isar.writeTxn(() async {
+      for (final t in stale) {
+        await _isar.tasks.delete(t.isarId);
+      }
     });
   }
 
@@ -64,6 +106,7 @@ class DatabaseService {
     return _isar.tasks
         .filter()
         .isCompletedEqualTo(false)
+        .deletedAtIsNull()
         .watch(fireImmediately: true);
   }
 }

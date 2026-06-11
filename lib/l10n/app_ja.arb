@@ -1,0 +1,124 @@
+{
+  "@@locale": "ja",
+
+  "appTitle": "OIKOMI",
+
+  "taskListTitle": "課題",
+  "taskListEmpty": "課題なし。平和。",
+  "addButton": "追加する",
+  "saveButton": "保存する",
+  "cancelButton": "キャンセル",
+  "editTaskTitle": "課題を編集",
+  "addTaskTitle": "課題を追加",
+
+  "taskNameLabel": "課題名",
+  "taskNamePlaceholder": "例：統計学レポート、英語小テスト",
+  "taskNameRequired": "課題名を入力してください",
+  "taskTypeLabel": "課題タイプ",
+  "deadlineLabel": "締切",
+  "timeAndAvoidanceLabel": "所要時間 / やりたくなさ",
+  "requiredTimeLabel": "所要時間",
+  "avoidanceLevelLabel": "やりたくなさ",
+  "saveTaskButton": "保存する",
+  "addTaskButton": "追加する",
+  "doneButton": "完了",
+
+  "swipeEdit": "編集",
+  "swipeComplete": "完了",
+  "swipeDelete": "削除",
+
+  "taskTypeMiniReport": "ミニレポート",
+  "taskTypeReport": "レポート",
+  "taskTypeQuizStudy": "小テスト勉強",
+  "taskTypePresentation": "発表準備",
+  "taskTypeFinalExam": "期末テスト",
+
+  "tglStatePeaceful": "まだ平和",
+  "tglStateSomeday": "そのうちやろ",
+  "tglStateReality": "そろそろ現実",
+  "tglStateNoEscape": "逃げ場なし",
+  "tglStateWar": "戦争",
+  "tglStateOverdue": "期限超過",
+
+  "notifSomeday": "未来の自分が泣いてる",
+  "notifReality": "そろそろ現実を見ようか",
+  "notifNoEscape": "逃げ場なくなりました",
+  "notifWar": "戦争です。以上。",
+  "notifHopeless": "すでに詰んでます。ご武運を。",
+  "notifChannelName": "タスク通知",
+
+  "onboardingSkip": "スキップ",
+  "onboardingPage1Heading": "締切までの時間がわかる",
+  "onboardingPage1Body": "OIKOMIは\"心理的つらさ\"で課題を管理する、\n新しいタスク管理アプリ",
+  "onboardingPage2Heading": "入力はたった4つ",
+  "onboardingPage2Body": "課題名・締切・所要時間・やりたくなさを\n入力するだけ。あとはOIKOMIが判断する",
+  "onboardingPage3Heading": "5段階で\"つらさ\"を表示",
+  "onboardingPage3Body": "まだ平和 → そのうちやろ → そろそろ現実 →\n逃げ場なし → 戦争。\n状況が変わると通知でお知らせ",
+  "onboardingPage4Heading": "さあ始めよう",
+  "onboardingPage4StartButton": "最初の課題を追加する",
+
+  "onboardingMockTaskName": "課題名",
+  "onboardingMockTaskValue": "統計学レポート",
+  "onboardingMockDeadline": "締切",
+  "onboardingMockDeadlineValue": "5/31 23:59",
+  "onboardingMockTime": "所要時間",
+  "onboardingMockTimeValue": "2時間",
+  "onboardingMockAvoidance": "やりたくなさ",
+  "onboardingMockAvoidanceValue": "7",
+
+  "timeUnitMinutes": "{count}分",
+  "@timeUnitMinutes": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "timeUnitHours": "{count}時間",
+  "@timeUnitHours": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "timeUnitHoursMinutes": "{hours}時間{minutes}分",
+  "@timeUnitHoursMinutes": {
+    "placeholders": {
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" }
+    }
+  },
+
+  "settingsTitle": "設定",
+  "settingsSectionGeneral": "一般",
+  "settingsNotifications": "通知",
+  "settingsLanguage": "言語",
+  "settingsLanguageValue": "システム設定に従う",
+  "settingsSectionInfo": "情報",
+  "settingsVersion": "バージョン",
+  "settingsPrivacyPolicy": "プライバシーポリシー",
+  "settingsTermsOfService": "利用規約",
+  "settingsSupport": "サポート・お問い合わせ",
+  "settingsUrlError": "URLを開けませんでした",
+  "settingsSectionPremium": "Premium",
+  "settingsRestorePurchase": "購入を復元",
+  "settingsPremiumUpgrade": "Premiumにアップグレード",
+  "settingsPremiumCustomThreshold": "カスタム TGL閾値",
+  "settingsPremiumComingSoonTitle": "近日公開",
+  "settingsPremiumComingSoonBody": "Premium機能は今後のアップデートで追加予定です。",
+
+  "taskDetailTitle": "課題詳細",
+  "deleteButton": "削除",
+  "completeButton": "完了にする",
+  "undoButton": "元に戻す",
+  "taskDeletedMessage": "課題を削除しました",
+  "taskCompletedMessage": "完了にしました",
+
+  "avoidance1": "全然ない",
+  "avoidance2": "まだ余裕",
+  "avoidance3": "なくはない",
+  "avoidance4": "ちょっとどうかな",
+  "avoidance5": "まあいやだ",
+  "avoidance6": "正直やりたくない",
+  "avoidance7": "かなりやりたくない",
+  "avoidance8": "せつにやりたくない",
+  "avoidance9": "マジでやりたくない",
+  "avoidance10": "死んでもやりたくない"
+}

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../l10n/app_localizations.dart';
 import '../services/database_service.dart';
 import '../services/notification_service.dart';
+import '../widgets/adaptive/adaptive_app_bar.dart';
 
 const _privacyUrl = 'https://kobu-kgw.github.io/OIKOMIapp/privacy.html';
 const _termsUrl = 'https://kobu-kgw.github.io/OIKOMIapp/terms.html';
@@ -45,45 +47,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _launchUrl(String url) async {
+    final l = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
     final uri = Uri.parse(url);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('URLを開けませんでした')),
-        );
+        messenger.showSnackBar(SnackBar(content: Text(l.settingsUrlError)));
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F7),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFF5F5F7),
-        elevation: 0,
-        title: const Text(
-          '設定',
-          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
-        ),
-      ),
+      appBar: adaptiveAppBar(title: l.settingsTitle),
       body: ListView(
         children: [
           // ─── 一般 ───────────────────────────────────────────────
-          _SectionHeader('一般'),
+          _SectionHeader(l.settingsSectionGeneral),
           _SettingsCard(
             children: [
               SwitchListTile.adaptive(
                 value: _notificationsEnabled,
                 onChanged: _toggleNotifications,
-                title: const Text('通知'),
+                title: Text(l.settingsNotifications),
                 activeTrackColor: Colors.blue,
               ),
               const Divider(height: 1, indent: 16),
               ListTile(
-                title: const Text('言語'),
+                title: Text(l.settingsLanguage),
                 trailing: Text(
-                  'システム設定に従う',
+                  l.settingsLanguageValue,
                   style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
                 ),
               ),
@@ -91,31 +87,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
 
           // ─── 情報 ────────────────────────────────────────────────
-          _SectionHeader('情報'),
+          _SectionHeader(l.settingsSectionInfo),
           _SettingsCard(
             children: [
-              const ListTile(
-                title: Text('バージョン'),
-                trailing: Text(
+              ListTile(
+                title: Text(l.settingsVersion),
+                trailing: const Text(
                   '1.1.0',
                   style: TextStyle(color: Colors.grey, fontSize: 14),
                 ),
               ),
               const Divider(height: 1, indent: 16),
               ListTile(
-                title: const Text('プライバシーポリシー'),
+                title: Text(l.settingsPrivacyPolicy),
                 trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                 onTap: () => _launchUrl(_privacyUrl),
               ),
               const Divider(height: 1, indent: 16),
               ListTile(
-                title: const Text('利用規約'),
+                title: Text(l.settingsTermsOfService),
                 trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                 onTap: () => _launchUrl(_termsUrl),
               ),
               const Divider(height: 1, indent: 16),
               ListTile(
-                title: const Text('サポート・お問い合わせ'),
+                title: Text(l.settingsSupport),
                 trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                 onTap: () => _launchUrl(_supportUrl),
               ),

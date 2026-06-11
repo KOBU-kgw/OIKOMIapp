@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
+import '../l10n/l10n_extensions.dart';
 import '../models/task.dart';
 import '../models/tgl_state.dart';
 import '../services/database_service.dart';
 import '../services/notification_service.dart';
 import '../services/tgl_calculator.dart';
+import '../widgets/adaptive/adaptive_app_bar.dart';
+import 'task_detail_screen.dart';
 import 'task_form_screen.dart';
 import 'settings_screen.dart';
 
@@ -12,12 +16,11 @@ class TaskListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F7),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFF5F5F7),
-        elevation: 0,
-        title: const Text('課題', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      appBar: adaptiveAppBar(
+        title: l.taskListTitle,
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
@@ -43,21 +46,45 @@ class TaskListScreen extends StatelessWidget {
           }
 
           final tasks = snapshot.data!;
-          tasks.sort((a, b) => calculateTGL(b).compareTo(calculateTGL(a)));
+          tasks.sort((a, b) {
+            final aOD = taskToState(a) == TGLState.overdue;
+            final bOD = taskToState(b) == TGLState.overdue;
+            if (aOD != bOD) return aOD ? -1 : 1;
+            final aTgl = calculateTGL(a);
+            final bTgl = calculateTGL(b);
+            if ((aTgl - bTgl).abs() >= 0.05) return bTgl.compareTo(aTgl);
+            final dc = a.deadline.compareTo(b.deadline);
+            if (dc != 0) return dc;
+            return a.createdAt.compareTo(b.createdAt);
+          });
 
           if (tasks.isEmpty) {
-            return const Center(
+            return Center(
               child: Text(
-                '課題なし。平和。',
-                style: TextStyle(fontSize: 18, color: Colors.grey),
+                l.taskListEmpty,
+                style: const TextStyle(fontSize: 18, color: Colors.grey),
               ),
             );
           }
 
+          final overdueTasks = tasks.where((t) => taskToState(t) == TGLState.overdue).toList();
+          final activeTasks  = tasks.where((t) => taskToState(t) != TGLState.overdue).toList();
+
+          final List<Widget> items = [];
+          if (overdueTasks.isNotEmpty) {
+            items.add(_SectionHeader(
+              l.tglStateOverdue,
+              color: const Color(0xFF7F1D1D),
+              key: const ValueKey('overdue-header'),
+            ));
+            items.addAll(overdueTasks.map((t) => _TaskCard(key: ValueKey(t.id), task: t)));
+          }
+          items.addAll(activeTasks.map((t) => _TaskCard(key: ValueKey(t.id), task: t)));
+
           return ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            itemCount: tasks.length,
-            itemBuilder: (context, index) => _TaskCard(task: tasks[index]),
+            itemCount: items.length,
+            itemBuilder: (context, index) => items[index],
           );
         },
       ),
@@ -68,7 +95,7 @@ class TaskListScreen extends StatelessWidget {
 // ─── Task Card ────────────────────────────────────────────────
 
 class _TaskCard extends StatefulWidget {
-  const _TaskCard({required this.task});
+  const _TaskCard({super.key, required this.task});
   final Task task;
 
   @override
@@ -78,7 +105,7 @@ class _TaskCard extends StatefulWidget {
 class _TaskCardState extends State<_TaskCard> {
   double _dragOffset = 0;
   bool _revealed = false;
-  static const double _revealWidth = 210.0; // 3ボタン × 70px
+  static const double _revealWidth = 70.0; // 完了ボタン 1つ × 70px
 
   void _closeMenu() => setState(() {
         _dragOffset = 0;
@@ -86,45 +113,47 @@ class _TaskCardState extends State<_TaskCard> {
       });
 
   Future<void> _complete() async {
-    try {
-      await DatabaseService.markCompleted(widget.task.id);
-      await NotificationService.cancelNotificationsForTask(widget.task.id);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('完了処理に失敗しました: $e')),
-        );
-      }
-    }
-  }
-
-  Future<void> _delete() async {
-    try {
-      await NotificationService.cancelNotificationsForTask(widget.task.id);
-      await DatabaseService.deleteTask(widget.task.id);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('削除に失敗しました: $e')),
-        );
-      }
-    }
-  }
-
-  void _edit(BuildContext context) {
-    _closeMenu();
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => TaskFormScreen(task: widget.task)),
+    final l = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    final taskId = widget.task.id;
+    await DatabaseService.markCompleted(taskId);
+    await NotificationService.cancelNotificationsForTask(taskId);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(l.taskCompletedMessage),
+        duration: const Duration(seconds: 5),
+        action: SnackBarAction(
+          label: l.undoButton,
+          onPressed: () async {
+            await DatabaseService.undoComplete(taskId);
+            final t = await DatabaseService.getTaskByUuid(taskId);
+            if (t != null) {
+              await NotificationService.scheduleNotificationsForTask(t);
+            }
+          },
+        ),
+      ),
     );
+  }
+
+  String _formatHours(double hours) {
+    final l = AppLocalizations.of(context)!;
+    final totalMinutes = (hours * 60).round();
+    final h = totalMinutes ~/ 60;
+    final m = totalMinutes % 60;
+    if (h == 0) return l.timeUnitMinutes(m);
+    if (m == 0) return l.timeUnitHours(h);
+    return l.timeUnitHoursMinutes(h, m);
   }
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     final task = widget.task;
-    final tgl = calculateTGL(task);
-    final state = tglToState(tgl);
-    final isHighAlert = state == TGLState.noEscape || state == TGLState.war;
+    final state = taskToState(task);
+    final isHighAlert = state == TGLState.noEscape ||
+        state == TGLState.war ||
+        state == TGLState.overdue;
 
     final deadlineText =
         '${task.deadline.month}/${task.deadline.day} '
@@ -136,25 +165,15 @@ class _TaskCardState extends State<_TaskCard> {
         borderRadius: BorderRadius.circular(14),
         child: Stack(
           children: [
-            // 背景アクションボタン
+            // 背景アクションボタン（完了のみ）
             Positioned.fill(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   _ActionButton(
-                    label: '編集',
-                    color: Colors.blue,
-                    onTap: () => _edit(context),
-                  ),
-                  _ActionButton(
-                    label: '完了',
+                    label: l.swipeComplete,
                     color: Colors.green,
                     onTap: _complete,
-                  ),
-                  _ActionButton(
-                    label: '削除',
-                    color: Colors.red,
-                    onTap: _delete,
                   ),
                 ],
               ),
@@ -178,7 +197,16 @@ class _TaskCardState extends State<_TaskCard> {
                 });
               },
               onTap: () {
-                if (_revealed) _closeMenu();
+                if (_revealed) {
+                  _closeMenu();
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => TaskDetailScreen(task: widget.task),
+                    ),
+                  );
+                }
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
@@ -209,7 +237,7 @@ class _TaskCardState extends State<_TaskCard> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '${task.type.label}　M=${task.avoidance}　${_formatHours(task.requiredHours)}',
+                            '${task.type.label(context)}　M=${task.avoidance}　${_formatHours(task.requiredHours)}',
                             style: const TextStyle(fontSize: 12, color: Colors.grey),
                           ),
                         ],
@@ -219,7 +247,7 @@ class _TaskCardState extends State<_TaskCard> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        _StatePill(state: state),
+                        TaskStatePill(state: state),
                         const SizedBox(height: 6),
                         Text(
                           deadlineText,
@@ -235,15 +263,6 @@ class _TaskCardState extends State<_TaskCard> {
         ),
       ),
     );
-  }
-
-  String _formatHours(double hours) {
-    final totalMinutes = (hours * 60).round();
-    final h = totalMinutes ~/ 60;
-    final m = totalMinutes % 60;
-    if (h == 0) return '$m分';
-    if (m == 0) return '$h時間';
-    return '$h時間$m分';
   }
 }
 
@@ -275,10 +294,27 @@ class _ActionButton extends StatelessWidget {
   }
 }
 
+// ─── Section Header ───────────────────────────────────────────
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader(this.label, {super.key, this.color = Colors.grey});
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(top: 8, bottom: 4),
+        child: Text(
+          label,
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: color),
+        ),
+      );
+}
+
 // ─── State Pill ───────────────────────────────────────────────
 
-class _StatePill extends StatelessWidget {
-  const _StatePill({required this.state});
+class TaskStatePill extends StatelessWidget {
+  const TaskStatePill({super.key, required this.state});
   final TGLState state;
 
   @override
@@ -290,7 +326,7 @@ class _StatePill extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        state.label,
+        state.label(context),
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
@@ -307,6 +343,7 @@ class _StatePill extends StatelessWidget {
       case TGLState.reality:  return const Color(0xFFFFE0B2);
       case TGLState.noEscape: return const Color(0xFFFFCDD2);
       case TGLState.war:      return const Color(0xFFB71C1C);
+      case TGLState.overdue:  return const Color(0xFF7F1D1D);
     }
   }
 
@@ -317,6 +354,7 @@ class _StatePill extends StatelessWidget {
       case TGLState.reality:  return const Color(0xFFE65100);
       case TGLState.noEscape: return const Color(0xFFC62828);
       case TGLState.war:      return Colors.white;
+      case TGLState.overdue:  return Colors.white;
     }
   }
 }

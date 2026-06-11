@@ -1,50 +1,45 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/l10n_extensions.dart';
 import '../models/task.dart';
+import '../models/tgl_state.dart';
 import '../services/database_service.dart';
 import '../services/notification_service.dart';
+import '../services/tgl_calculator.dart';
 import '../widgets/adaptive/adaptive_app_bar.dart';
 import '../widgets/adaptive/adaptive_button.dart';
 import '../widgets/task_form_widgets.dart';
+import 'task_list_screen.dart' show TaskStatePill;
 
-class TaskFormScreen extends StatefulWidget {
-  const TaskFormScreen({super.key, this.task});
-
-  /// null → 追加モード、非null → 編集モード
-  final Task? task;
+class TaskDetailScreen extends StatefulWidget {
+  const TaskDetailScreen({super.key, required this.task});
+  final Task task;
 
   @override
-  State<TaskFormScreen> createState() => _TaskFormScreenState();
+  State<TaskDetailScreen> createState() => _TaskDetailScreenState();
 }
 
-class _TaskFormScreenState extends State<TaskFormScreen> {
+class _TaskDetailScreenState extends State<TaskDetailScreen> {
   late final TextEditingController _titleController;
   late TaskType _selectedType;
   late DateTime _deadline;
-  late int _timeIndex;  // 0-based: index 0 = 15分
-  late int _avoidance;  // 1〜10
-
-  bool get _isEditing => widget.task != null;
+  late int _timeIndex;
+  late int _avoidance;
 
   static const int _timeStepMinutes = 15;
-  static const int _timeSteps = 96; // 15min〜24h
+  static const int _timeSteps = 96;
 
   @override
   void initState() {
     super.initState();
     final t = widget.task;
-    _titleController = TextEditingController(text: t?.title ?? '');
-    _selectedType = t?.type ?? TaskType.report;
-    _deadline = t?.deadline ?? DateTime.now();
-    _timeIndex = t != null
-        ? ((t.requiredHours * 60) / _timeStepMinutes).round() - 1
-        : 3; // デフォルト60分
-    _avoidance = t?.avoidance ?? 5;
+    _titleController = TextEditingController(text: t.title);
+    _selectedType = t.type;
+    _deadline = t.deadline;
+    _timeIndex = ((t.requiredHours * 60) / _timeStepMinutes).round() - 1;
+    _avoidance = t.avoidance;
   }
 
   @override
@@ -69,58 +64,37 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     final l = AppLocalizations.of(context)!;
     final minDate = DateTime.now().subtract(const Duration(minutes: 1));
     final initial = _deadline.isBefore(minDate) ? minDate : _deadline;
-    if (Platform.isIOS) {
-      DateTime selected = initial;
-      await showCupertinoModalPopup<void>(
-        context: context,
-        builder: (context) => Container(
-          height: 320,
-          color: CupertinoColors.systemBackground.resolveFrom(context),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  CupertinoButton(
-                    child: Text(l.doneButton),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
+    DateTime picked = initial;
+    await showCupertinoModalPopup<void>(
+      context: context,
+      builder: (_) => Container(
+        height: 300,
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        child: Column(
+          children: [
+            Align(
+              alignment: Alignment.centerRight,
+              child: CupertinoButton(
+                child: Text(l.doneButton),
+                onPressed: () {
+                  setState(() => _deadline = picked);
+                  Navigator.pop(context);
+                },
               ),
-              Expanded(
-                child: CupertinoDatePicker(
-                  mode: CupertinoDatePickerMode.dateAndTime,
-                  initialDateTime: initial,
-                  minimumDate: minDate,
-                  maximumDate: DateTime.now().add(const Duration(days: 365 * 5)),
-                  use24hFormat: true,
-                  onDateTimeChanged: (dt) => selected = dt,
-                ),
+            ),
+            Expanded(
+              child: CupertinoDatePicker(
+                mode: CupertinoDatePickerMode.dateAndTime,
+                initialDateTime: initial,
+                minimumDate: minDate,
+                use24hFormat: true,
+                onDateTimeChanged: (dt) => picked = dt,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      );
-      if (mounted) setState(() => _deadline = selected);
-    } else {
-      final date = await showDatePicker(
-        context: context,
-        initialDate: initial,
-        firstDate: minDate,
-        lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
-      );
-      if (date == null || !mounted) return;
-
-      final time = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.fromDateTime(_deadline),
-      );
-      if (time == null || !mounted) return;
-
-      setState(() {
-        _deadline = DateTime(date.year, date.month, date.day, time.hour, time.minute);
-      });
-    }
+      ),
+    );
   }
 
   Future<void> _submit() async {
@@ -133,35 +107,81 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
       return;
     }
 
-    final task = widget.task ?? Task();
+    final task = widget.task;
     task
-      ..id = widget.task?.id ?? const Uuid().v4()
+      ..id = widget.task.id.isNotEmpty ? widget.task.id : const Uuid().v4()
       ..title = title
       ..deadline = _deadline
       ..requiredHours = _requiredHours
       ..type = _selectedType
       ..avoidance = _avoidance
-      ..isCompleted = widget.task?.isCompleted ?? false
-      ..createdAt = widget.task?.createdAt ?? DateTime.now()
-      ..deletedAt = widget.task?.deletedAt
-      ..completedAt = widget.task?.completedAt;
+      ..deletedAt = widget.task.deletedAt
+      ..completedAt = widget.task.completedAt;
 
-    try {
-      await DatabaseService.saveTask(task);
-      await NotificationService.scheduleNotificationsForTask(task);
-      if (mounted) Navigator.pop(context);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('保存に失敗しました: $e')),
-        );
-      }
-    }
+    await DatabaseService.saveTask(task);
+    await NotificationService.scheduleNotificationsForTask(task);
+
+    if (mounted) Navigator.pop(context);
+  }
+
+  Future<void> _complete() async {
+    final l = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    final taskId = widget.task.id;
+    await DatabaseService.markCompleted(taskId);
+    await NotificationService.cancelNotificationsForTask(taskId);
+    if (!mounted) return;
+    Navigator.pop(context);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(l.taskCompletedMessage),
+        duration: const Duration(seconds: 5),
+        action: SnackBarAction(
+          label: l.undoButton,
+          onPressed: () async {
+            await DatabaseService.undoComplete(taskId);
+            final t = await DatabaseService.getTaskByUuid(taskId);
+            if (t != null) {
+              await NotificationService.scheduleNotificationsForTask(t);
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _delete() async {
+    final l = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+    final taskId = widget.task.id;
+    await NotificationService.cancelNotificationsForTask(taskId);
+    await DatabaseService.softDeleteTask(taskId);
+    if (!mounted) return;
+    Navigator.pop(context);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(l.taskDeletedMessage),
+        duration: const Duration(seconds: 5),
+        action: SnackBarAction(
+          label: l.undoButton,
+          onPressed: () async {
+            await DatabaseService.undoDeleteTask(taskId);
+            final t = await DatabaseService.getTaskByUuid(taskId);
+            if (t != null) {
+              await NotificationService.scheduleNotificationsForTask(t);
+            }
+          },
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
+    final state = taskToState(widget.task);
+    final isOverdue = state == TGLState.overdue;
+
     final deadlineText =
         '${_deadline.year}/${_deadline.month.toString().padLeft(2, '0')}/${_deadline.day.toString().padLeft(2, '0')} '
         '${_deadline.hour.toString().padLeft(2, '0')}:${_deadline.minute.toString().padLeft(2, '0')}';
@@ -169,12 +189,28 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F7),
       appBar: adaptiveAppBar(
-        title: _isEditing ? l.editTaskTitle : l.addTaskTitle,
+        title: l.taskDetailTitle,
         leading: adaptiveTextButton(
           text: l.cancelButton,
           onPressed: () => Navigator.pop(context),
         ),
         leadingWidth: 100,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.check_circle_outline),
+            tooltip: l.completeButton,
+            onPressed: _complete,
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            tooltip: l.deleteButton,
+            onPressed: _delete,
+          ),
+          adaptiveTextButton(
+            text: l.saveTaskButton,
+            onPressed: _submit,
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -182,6 +218,35 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // 状態ヘッダーバナー
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: isOverdue
+                      ? const Color(0xFF7F1D1D)
+                      : const Color(0xFFE8F0FE),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    TaskStatePill(state: state),
+                    const SizedBox(width: 10),
+                    Text(
+                      widget.task.title,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: isOverdue ? Colors.white : Colors.black87,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+
               TaskFormCard(
                 child: TextField(
                   controller: _titleController,
@@ -282,22 +347,6 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                       ),
                     ),
                   ],
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: _submit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    textStyle: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
-                  ),
-                  child: Text(_isEditing ? l.saveTaskButton : l.addTaskButton),
                 ),
               ),
             ],
