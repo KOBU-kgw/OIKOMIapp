@@ -72,10 +72,14 @@ class TaskListScreen extends StatelessWidget {
 
           final List<Widget> items = [];
           if (overdueTasks.isNotEmpty) {
-            items.add(_SectionHeader(l.tglStateOverdue, color: const Color(0xFF7F1D1D)));
-            items.addAll(overdueTasks.map((t) => _TaskCard(task: t)));
+            items.add(_SectionHeader(
+              l.tglStateOverdue,
+              color: const Color(0xFF7F1D1D),
+              key: const ValueKey('overdue-header'),
+            ));
+            items.addAll(overdueTasks.map((t) => _TaskCard(key: ValueKey(t.id), task: t)));
           }
-          items.addAll(activeTasks.map((t) => _TaskCard(task: t)));
+          items.addAll(activeTasks.map((t) => _TaskCard(key: ValueKey(t.id), task: t)));
 
           return ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -91,7 +95,7 @@ class TaskListScreen extends StatelessWidget {
 // ─── Task Card ────────────────────────────────────────────────
 
 class _TaskCard extends StatefulWidget {
-  const _TaskCard({required this.task});
+  const _TaskCard({super.key, required this.task});
   final Task task;
 
   @override
@@ -110,11 +114,11 @@ class _TaskCardState extends State<_TaskCard> {
 
   Future<void> _complete() async {
     final l = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
     final taskId = widget.task.id;
     await DatabaseService.markCompleted(taskId);
     await NotificationService.cancelNotificationsForTask(taskId);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
+    messenger.showSnackBar(
       SnackBar(
         content: Text(l.taskCompletedMessage),
         duration: const Duration(seconds: 5),
@@ -293,7 +297,7 @@ class _ActionButton extends StatelessWidget {
 // ─── Section Header ───────────────────────────────────────────
 
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader(this.label, {this.color = Colors.grey});
+  const _SectionHeader(this.label, {super.key, this.color = Colors.grey});
   final String label;
   final Color color;
 

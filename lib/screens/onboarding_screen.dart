@@ -50,10 +50,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               _Page2(),
               _Page3(),
               _Page4(onStart: () async {
+                final navigator = Navigator.of(context);
                 await _completeOnboarding(context);
                 if (!context.mounted) return;
-                Navigator.pushReplacement(
-                  context,
+                navigator.pushReplacement(
+                  MaterialPageRoute(builder: (_) => const TaskListScreen()),
+                );
+                navigator.push(
                   MaterialPageRoute(builder: (_) => const TaskFormScreen()),
                 );
               }),
