@@ -293,4 +293,20 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get avoidance10 => 'Over my dead body';
+
+  @override
+  String whatsNewTitle(String version) {
+    return 'What\'s New in v$version';
+  }
+
+  @override
+  String get whatsNewClose => 'OK';
+
+  @override
+  String get whatsNewItem1 =>
+      'Improved notification timing — now based on active hours (excludes sleep)';
+
+  @override
+  String get whatsNewItem2 =>
+      'Sort toggle button — switch between TGL and deadline order with one tap';
 }

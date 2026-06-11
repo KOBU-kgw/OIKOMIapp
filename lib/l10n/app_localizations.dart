@@ -649,6 +649,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Over my dead body'**
   String get avoidance10;
+
+  /// No description provided for @whatsNewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s New in v{version}'**
+  String whatsNewTitle(String version);
+
+  /// No description provided for @whatsNewClose.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get whatsNewClose;
+
+  /// No description provided for @whatsNewItem1.
+  ///
+  /// In en, this message translates to:
+  /// **'Improved notification timing — now based on active hours (excludes sleep)'**
+  String get whatsNewItem1;
+
+  /// No description provided for @whatsNewItem2.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort toggle button — switch between TGL and deadline order with one tap'**
+  String get whatsNewItem2;
 }
 
 class _AppLocalizationsDelegate

@@ -122,30 +122,32 @@ class NotificationService {
     final T = task.requiredHours;
     final M = task.avoidance.toDouble();
     final now = DateTime.now();
-    final deadlineHours = task.deadline.difference(now).inMinutes / 60.0;
-    if (deadlineHours <= 0) return null;
+    final calendarHours = task.deadline.difference(now).inMinutes / 60.0;
+    if (calendarHours <= 0) return null;
 
-    double tglAtD(double D) {
-      final slack = softplus(D - T, kSmoothness) + epsilon;
+    final effectiveDeadline = calendarHours * kActiveRatio;
+
+    double tglAtEffective(double effectiveD) {
+      final slack = softplus(effectiveD - T, kSmoothness) + epsilon;
       return (T * M) / slack;
     }
 
-    // TGL が threshold 未満なら既に遷移済みか範囲外
-    if (tglAtD(deadlineHours) >= threshold) return null;
-    if (tglAtD(0) < threshold) return null;
+    if (tglAtEffective(effectiveDeadline) >= threshold) return null;
+    if (tglAtEffective(0) < threshold) return null;
 
-    double lo = 0.0, hi = deadlineHours;
+    double lo = 0.0, hi = effectiveDeadline;
     for (int i = 0; i < 40; i++) {
       final mid = (lo + hi) / 2;
-      if (tglAtD(mid) >= threshold) {
+      if (tglAtEffective(mid) >= threshold) {
         lo = mid;
       } else {
         hi = mid;
       }
     }
 
-    final hoursFromNow = (lo + hi) / 2;
-    return now.add(Duration(milliseconds: (hoursFromNow * 3600 * 1000).toInt()));
+    final effectiveHoursFromNow = (lo + hi) / 2;
+    final calendarHoursFromNow = effectiveHoursFromNow / kActiveRatio;
+    return now.add(Duration(milliseconds: (calendarHoursFromNow * 3600 * 1000).toInt()));
   }
 
   static double? _thresholdFor(TGLState state) {

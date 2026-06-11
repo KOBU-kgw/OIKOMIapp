@@ -120,5 +120,15 @@
   "avoidance7": "かなりやりたくない",
   "avoidance8": "せつにやりたくない",
   "avoidance9": "マジでやりたくない",
-  "avoidance10": "死んでもやりたくない"
+  "avoidance10": "死んでもやりたくない",
+
+  "whatsNewTitle": "アップデート情報 v{version}",
+  "@whatsNewTitle": {
+    "placeholders": {
+      "version": { "type": "String" }
+    }
+  },
+  "whatsNewClose": "OK",
+  "whatsNewItem1": "通知タイミングを改善 — 睡眠時間を除外した実効稼働時間で計算",
+  "whatsNewItem2": "ソート切り替えボタンを追加 — TGL順と締切順をワンタップで切替"
 }

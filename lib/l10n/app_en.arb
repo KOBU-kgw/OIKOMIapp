@@ -120,5 +120,15 @@
   "avoidance7": "Really don't wanna",
   "avoidance8": "Please no",
   "avoidance9": "Seriously, NO",
-  "avoidance10": "Over my dead body"
+  "avoidance10": "Over my dead body",
+
+  "whatsNewTitle": "What's New in v{version}",
+  "@whatsNewTitle": {
+    "placeholders": {
+      "version": { "type": "String" }
+    }
+  },
+  "whatsNewClose": "OK",
+  "whatsNewItem1": "Improved notification timing — now based on active hours (excludes sleep)",
+  "whatsNewItem2": "Sort toggle button — switch between TGL and deadline order with one tap"
 }
