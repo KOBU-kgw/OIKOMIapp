@@ -30,13 +30,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _loadNotificationSetting() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
+      _notificationsEnabled =
+          prefs.getBool(NotificationService.prefKeyNotificationsEnabled) ?? true;
     });
   }
 
   Future<void> _toggleNotifications(bool value) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('notifications_enabled', value);
+    await prefs.setBool(NotificationService.prefKeyNotificationsEnabled, value);
     setState(() => _notificationsEnabled = value);
 
     if (value) {

@@ -8,6 +8,7 @@ import '../models/task_sort_order.dart';
 import '../models/tgl_state.dart';
 import '../services/database_service.dart';
 import '../services/notification_service.dart';
+import '../services/task_sorter.dart';
 import '../services/tgl_calculator.dart';
 import '../widgets/adaptive/adaptive_app_bar.dart';
 import 'task_detail_screen.dart';
@@ -77,29 +78,6 @@ class _TaskListScreenState extends State<TaskListScreen> {
     await prefs.setString('last_seen_version', kCurrentVersion);
   }
 
-  List<Task> _sortedTasks(List<Task> tasks) {
-    tasks.sort((a, b) {
-      final aOD = taskToState(a) == TGLState.overdue;
-      final bOD = taskToState(b) == TGLState.overdue;
-      if (aOD != bOD) return aOD ? -1 : 1;
-      if (!aOD && !bOD) {
-        switch (_sortOrder) {
-          case TaskSortOrder.tgl:
-            final aTgl = calculateTGL(a);
-            final bTgl = calculateTGL(b);
-            if ((aTgl - bTgl).abs() >= 0.05) return bTgl.compareTo(aTgl);
-            break;
-          case TaskSortOrder.deadline:
-            final dc = a.deadline.compareTo(b.deadline);
-            if (dc != 0) return dc;
-            break;
-        }
-      }
-      return a.createdAt.compareTo(b.createdAt);
-    });
-    return tasks;
-  }
-
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
@@ -148,9 +126,10 @@ class _TaskListScreenState extends State<TaskListScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final tasks = _sortedTasks(snapshot.data!);
+          final (overdue: overdueTasks, active: activeTasks) =
+              partitionAndSortTasks(snapshot.data!, _sortOrder);
 
-          if (tasks.isEmpty) {
+          if (overdueTasks.isEmpty && activeTasks.isEmpty) {
             return Center(
               child: Text(
                 l.taskListEmpty,
@@ -158,9 +137,6 @@ class _TaskListScreenState extends State<TaskListScreen> {
               ),
             );
           }
-
-          final overdueTasks = tasks.where((t) => taskToState(t) == TGLState.overdue).toList();
-          final activeTasks  = tasks.where((t) => taskToState(t) != TGLState.overdue).toList();
 
           final List<Widget> items = [];
           if (overdueTasks.isNotEmpty) {

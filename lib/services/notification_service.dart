@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 import '../models/task.dart';
 import '../models/tgl_state.dart';
@@ -14,6 +15,14 @@ class NotificationService {
   // iOS上限64件のうち本アプリが使う最大件数
   static const int _maxNotifications = 60;
   static const String _channelId = 'oikomi_notifications';
+
+  /// 通知ON/OFF設定の SharedPreferences キー（設定画面と共有）
+  static const String prefKeyNotificationsEnabled = 'notifications_enabled';
+
+  static Future<bool> _notificationsEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(prefKeyNotificationsEnabled) ?? true;
+  }
 
   static Future<void> init() async {
     final l = deviceL10n();
@@ -66,6 +75,8 @@ class NotificationService {
 
   static Future<void> scheduleNotificationsForTask(Task task) async {
     await cancelNotificationsForTask(task.id);
+
+    if (!await _notificationsEnabled()) return;
 
     final pending = await _plugin.pendingNotificationRequests();
     int remaining = _maxNotifications - pending.length;
@@ -240,6 +251,13 @@ class NotificationService {
   }
 
   static int _notificationId(String taskId, int stateIndex) {
-    return (taskId.hashCode.abs() % 1000000) * 10 + stateIndex;
+    // String.hashCode は実行間・プラットフォーム間で安定保証がないため、
+    // FNV-1a 32bit で決定的にハッシュする
+    var hash = 0x811C9DC5;
+    for (final unit in taskId.codeUnits) {
+      hash ^= unit;
+      hash = (hash * 0x01000193) & 0xFFFFFFFF;
+    }
+    return (hash % 1000000) * 10 + stateIndex;
   }
 }

@@ -18,9 +18,9 @@ double softplus(double x, double k) {
   return log(1 + exp(kx)) / k;
 }
 
-double calculateTGL(Task task) {
-  final now = DateTime.now();
-  final calendarHours = task.deadline.difference(now).inMinutes / 60.0;
+double calculateTGL(Task task, {DateTime? now}) {
+  final reference = now ?? DateTime.now();
+  final calendarHours = task.deadline.difference(reference).inMinutes / 60.0;
   final effectiveHours = calendarHours * kActiveRatio;
   final T = task.requiredHours;
   final M = task.avoidance.toDouble();
@@ -28,10 +28,11 @@ double calculateTGL(Task task) {
   return (T * M) / slack;
 }
 
-TGLState taskToState(Task task) {
-  final D = task.deadline.difference(DateTime.now()).inMinutes / 60.0;
+TGLState taskToState(Task task, {DateTime? now}) {
+  final reference = now ?? DateTime.now();
+  final D = task.deadline.difference(reference).inMinutes / 60.0;
   if (D < 0) return TGLState.overdue;
-  final tgl = calculateTGL(task);
+  final tgl = calculateTGL(task, now: reference);
   if (tgl < TGLThresholds.peaceful) return TGLState.peaceful;
   if (tgl < TGLThresholds.someday)  return TGLState.someday;
   if (tgl < TGLThresholds.reality)  return TGLState.reality;
