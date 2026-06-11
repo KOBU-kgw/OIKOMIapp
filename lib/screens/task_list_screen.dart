@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/l10n_extensions.dart';
 import '../models/task.dart';
+import '../models/task_sort_order.dart';
 import '../models/tgl_state.dart';
 import '../services/database_service.dart';
 import '../services/notification_service.dart';
@@ -11,8 +12,38 @@ import 'task_detail_screen.dart';
 import 'task_form_screen.dart';
 import 'settings_screen.dart';
 
-class TaskListScreen extends StatelessWidget {
+class TaskListScreen extends StatefulWidget {
   const TaskListScreen({super.key});
+
+  @override
+  State<TaskListScreen> createState() => _TaskListScreenState();
+}
+
+class _TaskListScreenState extends State<TaskListScreen> {
+  TaskSortOrder _sortOrder = TaskSortOrder.tgl;
+
+  List<Task> _sortedTasks(List<Task> tasks) {
+    tasks.sort((a, b) {
+      final aOD = taskToState(a) == TGLState.overdue;
+      final bOD = taskToState(b) == TGLState.overdue;
+      if (aOD != bOD) return aOD ? -1 : 1;
+      if (!aOD && !bOD) {
+        switch (_sortOrder) {
+          case TaskSortOrder.tgl:
+            final aTgl = calculateTGL(a);
+            final bTgl = calculateTGL(b);
+            if ((aTgl - bTgl).abs() >= 0.05) return bTgl.compareTo(aTgl);
+            break;
+          case TaskSortOrder.deadline:
+            final dc = a.deadline.compareTo(b.deadline);
+            if (dc != 0) return dc;
+            break;
+        }
+      }
+      return a.createdAt.compareTo(b.createdAt);
+    });
+    return tasks;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +53,23 @@ class TaskListScreen extends StatelessWidget {
       appBar: adaptiveAppBar(
         title: l.taskListTitle,
         actions: [
+          IconButton(
+            icon: Icon(
+              _sortOrder == TaskSortOrder.tgl
+                  ? Icons.warning_amber_rounded
+                  : Icons.access_time_rounded,
+            ),
+            tooltip: _sortOrder == TaskSortOrder.tgl
+                ? '締切が近い順に切り替え'
+                : 'ヤバい順に切り替え',
+            onPressed: () {
+              setState(() {
+                _sortOrder = _sortOrder == TaskSortOrder.tgl
+                    ? TaskSortOrder.deadline
+                    : TaskSortOrder.tgl;
+              });
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => Navigator.push(
@@ -45,18 +93,7 @@ class TaskListScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final tasks = snapshot.data!;
-          tasks.sort((a, b) {
-            final aOD = taskToState(a) == TGLState.overdue;
-            final bOD = taskToState(b) == TGLState.overdue;
-            if (aOD != bOD) return aOD ? -1 : 1;
-            final aTgl = calculateTGL(a);
-            final bTgl = calculateTGL(b);
-            if ((aTgl - bTgl).abs() >= 0.05) return bTgl.compareTo(aTgl);
-            final dc = a.deadline.compareTo(b.deadline);
-            if (dc != 0) return dc;
-            return a.createdAt.compareTo(b.createdAt);
-          });
+          final tasks = _sortedTasks(snapshot.data!);
 
           if (tasks.isEmpty) {
             return Center(

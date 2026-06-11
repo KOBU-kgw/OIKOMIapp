@@ -5,6 +5,12 @@ import '../models/tgl_state.dart';
 const double epsilon = 0.01;
 const double kSmoothness = 5.0;
 
+/// 1日の想定稼働時間（大学生想定: 睡眠6時間除く18時間）
+const double kActiveHoursPerDay = 18.0;
+
+/// カレンダー時間 → 実効稼働時間の換算係数
+const double kActiveRatio = kActiveHoursPerDay / 24.0; // 0.75
+
 double softplus(double x, double k) {
   final kx = k * x;
   if (kx > 30) return x;
@@ -14,10 +20,11 @@ double softplus(double x, double k) {
 
 double calculateTGL(Task task) {
   final now = DateTime.now();
-  final D = task.deadline.difference(now).inMinutes / 60.0;
+  final calendarHours = task.deadline.difference(now).inMinutes / 60.0;
+  final effectiveHours = calendarHours * kActiveRatio;
   final T = task.requiredHours;
   final M = task.avoidance.toDouble();
-  final slack = softplus(D - T, kSmoothness) + epsilon;
+  final slack = softplus(effectiveHours - T, kSmoothness) + epsilon;
   return (T * M) / slack;
 }
 
