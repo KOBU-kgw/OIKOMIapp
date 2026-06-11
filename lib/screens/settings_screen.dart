@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../app_version.dart';
 import '../l10n/app_localizations.dart';
 import '../services/database_service.dart';
 import '../services/notification_service.dart';
@@ -92,9 +93,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               ListTile(
                 title: Text(l.settingsVersion),
-                trailing: const Text(
-                  '1.3.0',
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                trailing: Text(
+                  kCurrentVersion,
+                  style: const TextStyle(color: Colors.grey, fontSize: 14),
                 ),
               ),
               const Divider(height: 1, indent: 16),

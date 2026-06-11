@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../app_version.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/l10n_extensions.dart';
 import '../models/task.dart';
@@ -21,6 +23,59 @@ class TaskListScreen extends StatefulWidget {
 
 class _TaskListScreenState extends State<TaskListScreen> {
   TaskSortOrder _sortOrder = TaskSortOrder.tgl;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _showWhatsNewIfNeeded());
+  }
+
+  Future<void> _showWhatsNewIfNeeded() async {
+    final prefs = await SharedPreferences.getInstance();
+    final lastSeen = prefs.getString('last_seen_version');
+    if (lastSeen == kCurrentVersion) return;
+
+    if (!mounted) return;
+    final l = AppLocalizations.of(context)!;
+
+    await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(l.whatsNewTitle(kCurrentVersion)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.notifications_active, size: 20),
+                const SizedBox(width: 8),
+                Expanded(child: Text(l.whatsNewItem1)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.sort, size: 20),
+                const SizedBox(width: 8),
+                Expanded(child: Text(l.whatsNewItem2)),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l.whatsNewClose),
+          ),
+        ],
+      ),
+    );
+
+    await prefs.setString('last_seen_version', kCurrentVersion);
+  }
 
   List<Task> _sortedTasks(List<Task> tasks) {
     tasks.sort((a, b) {

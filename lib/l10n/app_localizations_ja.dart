@@ -291,4 +291,18 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get avoidance10 => '死んでもやりたくない';
+
+  @override
+  String whatsNewTitle(String version) {
+    return 'アップデート情報 v$version';
+  }
+
+  @override
+  String get whatsNewClose => 'OK';
+
+  @override
+  String get whatsNewItem1 => '通知タイミングを改善 — 睡眠時間を除外した実効稼働時間で計算';
+
+  @override
+  String get whatsNewItem2 => 'ソート切り替えボタンを追加 — TGL順と締切順をワンタップで切替';
 }
