@@ -93,7 +93,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ListTile(
                 title: Text(l.settingsVersion),
                 trailing: const Text(
-                  '1.1.0',
+                  '1.3.0',
                   style: TextStyle(color: Colors.grey, fontSize: 14),
                 ),
               ),
