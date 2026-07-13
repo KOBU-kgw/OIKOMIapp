@@ -7,7 +7,7 @@ import Foundation
 
 import flutter_local_notifications
 import in_app_purchase_storekit
-import isar_flutter_libs
+import isar_community_flutter_libs
 import shared_preferences_foundation
 import url_launcher_macos
 
