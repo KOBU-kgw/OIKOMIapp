@@ -6,7 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 import '../models/task.dart';
 import '../models/tgl_state.dart';
+import 'database_service.dart';
 import 'l10n_helper.dart';
+import 'notification_id.dart';
 import 'tgl_calculator.dart';
 
 class NotificationService {
@@ -82,17 +84,26 @@ class NotificationService {
     int remaining = _maxNotifications - pending.length;
     if (remaining <= 0) return;
 
-    // hopeless 通知: T > D（必要時間が残り時間を超える）
+    // hopeless 通知: T > D（必要時間が残り時間を超える）。
+    // 同じhopelessエピソード中の再発火は抑制し、状態が解消されたらリセットする。
     final D = task.deadline.difference(DateTime.now()).inMinutes / 60.0;
-    if (D > 0 && task.requiredHours > D && remaining > 0) {
-      await _scheduleNotification(
-        id: _notificationId(task.id, 5),
-        task: task,
-        state: TGLState.overdue,
-        triggerTime: DateTime.now().add(const Duration(seconds: 2)),
-        isHopeless: true,
-      );
-      remaining--;
+    final isHopelessNow = D > 0 && task.requiredHours > D;
+    if (isHopelessNow) {
+      if (task.hopelessNotifiedAt == null && remaining > 0) {
+        await _scheduleNotification(
+          id: notificationId(task.id, 5),
+          task: task,
+          state: TGLState.overdue,
+          triggerTime: DateTime.now().add(const Duration(seconds: 2)),
+          isHopeless: true,
+        );
+        remaining--;
+        task.hopelessNotifiedAt = DateTime.now();
+        await DatabaseService.saveTask(task);
+      }
+    } else if (task.hopelessNotifiedAt != null) {
+      task.hopelessNotifiedAt = null;
+      await DatabaseService.saveTask(task);
     }
 
     final transitions = [
@@ -110,7 +121,7 @@ class NotificationService {
       if (triggerTime == null || !triggerTime.isAfter(DateTime.now())) continue;
 
       await _scheduleNotification(
-        id: _notificationId(task.id, index),
+        id: notificationId(task.id, index),
         task: task,
         state: targetState,
         triggerTime: triggerTime,
@@ -122,7 +133,7 @@ class NotificationService {
 
   static Future<void> cancelNotificationsForTask(String taskId) async {
     for (int i = 0; i < 6; i++) {
-      await _plugin.cancel(_notificationId(taskId, i));
+      await _plugin.cancel(notificationId(taskId, i));
     }
   }
 
@@ -250,14 +261,11 @@ class NotificationService {
     }
   }
 
-  static int _notificationId(String taskId, int stateIndex) {
-    // String.hashCode は実行間・プラットフォーム間で安定保証がないため、
-    // FNV-1a 32bit で決定的にハッシュする
-    var hash = 0x811C9DC5;
-    for (final unit in taskId.codeUnits) {
-      hash ^= unit;
-      hash = (hash * 0x01000193) & 0xFFFFFFFF;
-    }
-    return (hash % 1000000) * 10 + stateIndex;
+  /// DBの現在状態を正として全タスクの通知を再同期する統一エントリポイント。
+  /// タスクの保存・完了・削除・Undo後は、個別のcancel/scheduleではなく
+  /// 必ずこれを呼ぶこと（呼び出し前にDB書き込みを完了させておく）。
+  static Future<void> resyncFromDatabase() async {
+    final tasks = await DatabaseService.getAllIncompleteTasks();
+    await rescheduleAllNotifications(tasks);
   }
 }

@@ -28,9 +28,8 @@ Future<void> main() async {
 
 Future<void> _onAppLaunch() async {
   await DatabaseService.purgeStaleDeleted();
-  final tasks = await DatabaseService.getAllIncompleteTasks();
   // 全キャンセル後に再登録する（削除済みタスクや旧ID体系の通知が残らないように）
-  await NotificationService.rescheduleAllNotifications(tasks);
+  await NotificationService.resyncFromDatabase();
 }
 
 class TGLApp extends StatelessWidget {

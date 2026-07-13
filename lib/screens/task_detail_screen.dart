@@ -119,7 +119,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       ..completedAt = widget.task.completedAt;
 
     await DatabaseService.saveTask(task);
-    await NotificationService.scheduleNotificationsForTask(task);
+    await NotificationService.resyncFromDatabase();
 
     if (mounted) Navigator.pop(context);
   }
@@ -129,7 +129,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     final messenger = ScaffoldMessenger.of(context);
     final taskId = widget.task.id;
     await DatabaseService.markCompleted(taskId);
-    await NotificationService.cancelNotificationsForTask(taskId);
+    await NotificationService.resyncFromDatabase();
     if (!mounted) return;
     Navigator.pop(context);
     messenger.showSnackBar(
@@ -140,10 +140,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
           label: l.undoButton,
           onPressed: () async {
             await DatabaseService.undoComplete(taskId);
-            final t = await DatabaseService.getTaskByUuid(taskId);
-            if (t != null) {
-              await NotificationService.scheduleNotificationsForTask(t);
-            }
+            await NotificationService.resyncFromDatabase();
           },
         ),
       ),
@@ -154,8 +151,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     final l = AppLocalizations.of(context)!;
     final messenger = ScaffoldMessenger.of(context);
     final taskId = widget.task.id;
-    await NotificationService.cancelNotificationsForTask(taskId);
     await DatabaseService.softDeleteTask(taskId);
+    await NotificationService.resyncFromDatabase();
     if (!mounted) return;
     Navigator.pop(context);
     messenger.showSnackBar(
@@ -166,10 +163,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
           label: l.undoButton,
           onPressed: () async {
             await DatabaseService.undoDeleteTask(taskId);
-            final t = await DatabaseService.getTaskByUuid(taskId);
-            if (t != null) {
-              await NotificationService.scheduleNotificationsForTask(t);
-            }
+            await NotificationService.resyncFromDatabase();
           },
         ),
       ),

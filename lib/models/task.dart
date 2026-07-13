@@ -30,4 +30,7 @@ class Task {
   late DateTime createdAt;
   DateTime? deletedAt;
   DateTime? completedAt;
+
+  /// hopeless状態の通知を送った日時。再発火の抑制に使う。
+  DateTime? hopelessNotifiedAt;
 }

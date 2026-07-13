@@ -24,8 +24,8 @@ android {
         applicationId = "com.kobu.oikomi"
         minSdk = flutter.minSdkVersion
         targetSdk = 36
-        versionCode = 9
-        versionName = "1.1.1"
+        versionCode = 11
+        versionName = "1.4.1"
     }
 
     signingConfigs {

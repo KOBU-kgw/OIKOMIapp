@@ -185,7 +185,7 @@ class _TaskCardState extends State<_TaskCard> {
     final messenger = ScaffoldMessenger.of(context);
     final taskId = widget.task.id;
     await DatabaseService.markCompleted(taskId);
-    await NotificationService.cancelNotificationsForTask(taskId);
+    await NotificationService.resyncFromDatabase();
     messenger.showSnackBar(
       SnackBar(
         content: Text(l.taskCompletedMessage),
@@ -194,10 +194,7 @@ class _TaskCardState extends State<_TaskCard> {
           label: l.undoButton,
           onPressed: () async {
             await DatabaseService.undoComplete(taskId);
-            final t = await DatabaseService.getTaskByUuid(taskId);
-            if (t != null) {
-              await NotificationService.scheduleNotificationsForTask(t);
-            }
+            await NotificationService.resyncFromDatabase();
           },
         ),
       ),

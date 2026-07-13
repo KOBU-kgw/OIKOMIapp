@@ -3,7 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../app_version.dart';
 import '../l10n/app_localizations.dart';
-import '../services/database_service.dart';
 import '../services/notification_service.dart';
 import '../widgets/adaptive/adaptive_app_bar.dart';
 
@@ -41,8 +40,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() => _notificationsEnabled = value);
 
     if (value) {
-      final tasks = await DatabaseService.getAllIncompleteTasks();
-      await NotificationService.rescheduleAllNotifications(tasks);
+      await NotificationService.resyncFromDatabase();
     } else {
       await NotificationService.cancelAllNotifications();
     }
