@@ -140,36 +140,10 @@ class NotificationService {
   static DateTime? _calculateTransitionTime(Task task, TGLState state) {
     final threshold = _thresholdFor(state);
     if (threshold == null) return null;
-
-    final T = task.requiredHours;
-    final M = task.avoidance.toDouble();
     final now = DateTime.now();
-    final calendarHours = task.deadline.difference(now).inMinutes / 60.0;
-    if (calendarHours <= 0) return null;
-
-    final effectiveDeadline = calendarHours * kActiveRatio;
-
-    double tglAtEffective(double effectiveD) {
-      final slack = softplus(effectiveD - T, kSmoothness) + epsilon;
-      return (T * M) / slack;
-    }
-
-    if (tglAtEffective(effectiveDeadline) >= threshold) return null;
-    if (tglAtEffective(0) < threshold) return null;
-
-    double lo = 0.0, hi = effectiveDeadline;
-    for (int i = 0; i < 40; i++) {
-      final mid = (lo + hi) / 2;
-      if (tglAtEffective(mid) >= threshold) {
-        lo = mid;
-      } else {
-        hi = mid;
-      }
-    }
-
-    final effectiveHoursFromNow = (lo + hi) / 2;
-    final calendarHoursFromNow = effectiveHoursFromNow / kActiveRatio;
-    return now.add(Duration(milliseconds: (calendarHoursFromNow * 3600 * 1000).toInt()));
+    final hours = calendarHoursUntilThreshold(task, threshold, now: now);
+    if (hours == null) return null;
+    return now.add(Duration(milliseconds: (hours * 3600 * 1000).toInt()));
   }
 
   static double? _thresholdFor(TGLState state) {
