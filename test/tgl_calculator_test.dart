@@ -81,6 +81,95 @@ void main() {
     });
   });
 
+  group('calendarHoursUntilThreshold', () {
+    // 締切まで十分先の同一タスクに対し、しきい値ごとの到達時刻を比較する。
+    // TGL は締切に近づくほど上がるので、しきい値が高い状態ほど遅く到達するはず。
+    // 反転バグ（残り時間と経過時間の取り違え）が復活すると、この順序が崩れる。
+    test('higher thresholds are reached later (monotonic ordering)', () {
+      final now = DateTime(2026, 1, 1, 0, 0);
+      final task = _makeTask(
+        deadline: now.add(const Duration(hours: 100)),
+        requiredHours: 2,
+        avoidance: 5,
+      );
+      final someday =
+          calendarHoursUntilThreshold(task, TGLThresholds.peaceful, now: now);
+      final reality =
+          calendarHoursUntilThreshold(task, TGLThresholds.someday, now: now);
+      final noEscape =
+          calendarHoursUntilThreshold(task, TGLThresholds.reality, now: now);
+      final war =
+          calendarHoursUntilThreshold(task, TGLThresholds.noEscape, now: now);
+
+      expect(someday, isNotNull);
+      expect(reality, isNotNull);
+      expect(noEscape, isNotNull);
+      expect(war, isNotNull);
+
+      // someday → reality → noEscape → war の順に単調増加（＝war が締切に最も近い）
+      expect(someday!, lessThan(reality!));
+      expect(reality, lessThan(noEscape!));
+      expect(noEscape, lessThan(war!));
+    });
+
+    test('result is within (0, calendarHours)', () {
+      final now = DateTime(2026, 1, 1, 0, 0);
+      const calendarHours = 100.0;
+      final task = _makeTask(
+        deadline: now.add(const Duration(hours: 100)),
+        requiredHours: 2,
+        avoidance: 5,
+      );
+      final war =
+          calendarHoursUntilThreshold(task, TGLThresholds.noEscape, now: now)!;
+      expect(war, greaterThan(0));
+      expect(war, lessThan(calendarHours));
+      // war は締切に近い側で到達する（前半ではなく後半）
+      expect(war, greaterThan(calendarHours / 2));
+    });
+
+    test('returns null when threshold already reached', () {
+      final now = DateTime(2026, 1, 1, 0, 0);
+      // 締切間際・高逼迫度で、既に war しきい値を超えている
+      final task = _makeTask(
+        deadline: now.add(const Duration(hours: 2)),
+        requiredHours: 2,
+        avoidance: 5,
+      );
+      expect(
+        calendarHoursUntilThreshold(task, TGLThresholds.noEscape, now: now),
+        isNull,
+      );
+    });
+
+    test('returns null when threshold never reached before deadline', () {
+      final now = DateTime(2026, 1, 1, 0, 0);
+      // 必要時間が極小・低回避度で、締切時点(残り0)でも noEscape へ到達しない
+      final task = _makeTask(
+        deadline: now.add(const Duration(days: 60)),
+        requiredHours: 0.1,
+        avoidance: 1,
+      );
+      expect(
+        calendarHoursUntilThreshold(task, TGLThresholds.noEscape, now: now),
+        isNull,
+      );
+    });
+
+    test('returns null for past deadline', () {
+      final now = DateTime(2026, 1, 1, 0, 0);
+      final task = _makeTask(
+        deadline: now.subtract(const Duration(hours: 1)),
+        requiredHours: 2,
+        avoidance: 5,
+      );
+      expect(
+        calendarHoursUntilThreshold(task, TGLThresholds.someday, now: now),
+        isNull,
+      );
+    });
+  });
+
   group('taskToState', () {
     test('overdue task returns TGLState.overdue', () {
       final task = _makeTask(

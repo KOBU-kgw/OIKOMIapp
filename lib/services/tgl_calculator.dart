@@ -39,3 +39,39 @@ TGLState taskToState(Task task, {DateTime? now}) {
   if (tgl < TGLThresholds.noEscape) return TGLState.noEscape;
   return TGLState.war;
 }
+
+/// タスクのTGLが [threshold] に到達するまでの、今からの経過カレンダー時間（時間単位）。
+/// 既に到達済み、または締切までに到達しない場合は null。
+///
+/// TGL は締切に近づくほど（残り時間が減るほど）増加するため、二分探索は
+/// 「遷移が起きる瞬間に残っている実効時間」を求める。発火までの経過時間は
+/// その残り時間ではなく「実効締切 − 残り」で算出する必要がある。
+double? calendarHoursUntilThreshold(Task task, double threshold,
+    {DateTime? now}) {
+  final reference = now ?? DateTime.now();
+  final T = task.requiredHours;
+  final M = task.avoidance.toDouble();
+  final calendarHours = task.deadline.difference(reference).inMinutes / 60.0;
+  if (calendarHours <= 0) return null;
+  final effectiveDeadline = calendarHours * kActiveRatio;
+
+  double tglAt(double effectiveD) =>
+      (T * M) / (softplus(effectiveD - T, kSmoothness) + epsilon);
+
+  if (tglAt(effectiveDeadline) >= threshold) return null; // 既に到達済み
+  if (tglAt(0) < threshold) return null;                  // 締切までに到達しない
+
+  double lo = 0.0, hi = effectiveDeadline;
+  for (int i = 0; i < 40; i++) {
+    final mid = (lo + hi) / 2;
+    if (tglAt(mid) >= threshold) {
+      lo = mid;
+    } else {
+      hi = mid;
+    }
+  }
+  final remainingEffectiveAtCrossing = (lo + hi) / 2;
+  // 交点は「遷移時点で残っている実効時間」。経過時間 = 実効締切 − 残り。
+  final elapsedEffective = effectiveDeadline - remainingEffectiveAtCrossing;
+  return elapsedEffective / kActiveRatio;
+}

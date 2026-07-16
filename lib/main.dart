@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/data/latest.dart' as tzdata;
+import 'package:timezone/timezone.dart' as tz;
 import 'l10n/app_localizations.dart';
 import 'services/database_service.dart';
 import 'services/notification_service.dart';
@@ -10,7 +12,14 @@ import 'screens/onboarding_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  tz.initializeTimeZones();
+  tzdata.initializeTimeZones();
+  // 端末のタイムゾーンを tz.local に設定する（未設定だと UTC のままになる）。
+  try {
+    final localTimeZone = await FlutterTimezone.getLocalTimezone();
+    tz.setLocalLocation(tz.getLocation(localTimeZone.identifier));
+  } catch (e) {
+    debugPrint('setLocalLocation failed, using UTC: $e');
+  }
   await DatabaseService.init();
   await NotificationService.init();
 
