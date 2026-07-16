@@ -128,6 +128,33 @@ void main() {
       expect(war, greaterThan(calendarHours / 2));
     });
 
+    // 契約の直接検証: 返した経過時間だけ進めた時点で、表示用の calculateTGL が
+    // しきい値と一致すること。二分探索の内部実装に依存せず、/kActiveRatio の
+    // 付け忘れや係数ミス・オフセット・反転をまとめて捕捉できる最も強い検証。
+    test('TGL at the returned time equals the threshold (contract)', () {
+      final now = DateTime(2026, 1, 1, 0, 0);
+      final task = _makeTask(
+        deadline: now.add(const Duration(hours: 100)),
+        requiredHours: 2,
+        avoidance: 5,
+      );
+      for (final threshold in [
+        TGLThresholds.peaceful,
+        TGLThresholds.someday,
+        TGLThresholds.reality,
+        TGLThresholds.noEscape,
+      ]) {
+        final hours = calendarHoursUntilThreshold(task, threshold, now: now)!;
+        final atTransition =
+            now.add(Duration(milliseconds: (hours * 3600 * 1000).round()));
+        final tglThen = calculateTGL(task, now: atTransition);
+        // calculateTGL は inMinutes 切り捨てのため、しきい値の傾きが急な war 付近で
+        // 最大数%の丸め誤差が出る。相対5%許容で非フレーキーに契約を検証する。
+        expect(tglThen, closeTo(threshold, threshold * 0.05),
+            reason: 'threshold=$threshold, hours=$hours');
+      }
+    });
+
     test('returns null when threshold already reached', () {
       final now = DateTime(2026, 1, 1, 0, 0);
       // 締切間際・高逼迫度で、既に war しきい値を超えている
