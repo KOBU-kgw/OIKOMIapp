@@ -97,12 +97,46 @@
   "settingsTermsOfService": "利用規約",
   "settingsSupport": "サポート・お問い合わせ",
   "settingsUrlError": "URLを開けませんでした",
-  "settingsSectionPremium": "Premium",
+  "settingsSectionThresholdPack": "カスタム閾値",
   "settingsRestorePurchase": "購入を復元",
-  "settingsPremiumUpgrade": "Premiumにアップグレード",
-  "settingsPremiumCustomThreshold": "カスタム TGL閾値",
-  "settingsPremiumComingSoonTitle": "近日公開",
-  "settingsPremiumComingSoonBody": "Premium機能は今後のアップデートで追加予定です。",
+  "settingsCustomThresholds": "カスタム閾値",
+  "settingsCustomThresholdsLocked": "未購入",
+
+  "purchaseScreenTitle": "カスタム閾値パック",
+  "purchaseHeadline": "「戦争」が始まるラインを、あなた仕様に。",
+  "purchaseBody": "「まだ平和」から「戦争」まで、5段階のラインをあなた仕様に調整できるようになります。",
+  "purchaseOneTime": "一度の購入で永続利用できます",
+  "purchaseScopeNote": "対象はカスタム閾値機能です。タスク管理・通知などの基本機能は無料のままご利用いただけます。",
+  "purchaseButton": "{price} で購入",
+  "@purchaseButton": {
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
+  "purchaseUnavailable": "ストアに接続できません",
+  "purchaseSuccess": "カスタム閾値が解放されました！",
+  "purchaseRestoreDone": "購入情報を確認しました",
+  "purchaseErrorGeneric": "購入処理でエラーが発生しました",
+
+  "thresholdEditorTitle": "カスタム閾値",
+  "thresholdEditorPreviewTitle": "カスタム閾値プレビュー",
+  "thresholdEditorIntro": "あなたの「戦争」が始まるラインを決めよう",
+  "thresholdEditorUseCustom": "カスタム閾値を使う",
+  "thresholdLabelPeaceful": "まだ平和 → いつかやる",
+  "thresholdLabelSomeday": "いつかやる → 現実見ろ",
+  "thresholdLabelReality": "現実見ろ → 逃げ場なし",
+  "thresholdLabelNoEscape": "逃げ場なし → 戦争",
+  "thresholdReset": "デフォルトに戻す",
+  "thresholdSave": "保存",
+  "thresholdSaved": "閾値を保存しました",
+  "thresholdPreviewHint": "サンプル課題のラベルがどう変わるか確認できます",
+  "thresholdPreviewLockedNote": "保存にはカスタム閾値パックの購入が必要です",
+  "thresholdSampleTaskNear": "明日締切のレポート",
+  "thresholdSampleTaskMid": "3日後の小テスト対策",
+  "thresholdSampleTaskFar": "来週の期末レポート",
+
+  "nudgeCardTitle": "「戦争」が始まるタイミング、人によって違うらしい。",
+  "nudgeCardSubtitle": "タップしてラインを調整してみる",
 
   "taskDetailTitle": "課題詳細",
   "deleteButton": "削除",
@@ -129,6 +163,6 @@
     }
   },
   "whatsNewClose": "OK",
-  "whatsNewItem1": "通知タイミングを改善 — 睡眠時間を除外した実効稼働時間で計算",
-  "whatsNewItem2": "ソート切り替えボタンを追加 — TGL順と締切順をワンタップで切替"
+  "whatsNewItem1": "ヤバさ計算を強化 — 先に締め切られる他の課題の分も考慮するように",
+  "whatsNewItem2": "カスタム閾値パック登場 — 「戦争」が始まるラインを自分仕様に調整（設定から）"
 }

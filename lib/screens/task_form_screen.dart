@@ -148,7 +148,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
 
     try {
       await DatabaseService.saveTask(task);
-      await NotificationService.resyncFromDatabase();
+      NotificationService.requestResync();
       if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted) {

@@ -1,0 +1,59 @@
+{
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
+  "identifier" : "304BBF66",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
+      "internalID" : "1C4E18F4",
+      "localizations" : [
+        {
+          "description" : "Unlock custom TGL threshold adjustment. Personalize when tasks transition between peaceful, someday, reality, noEscape, and overdue states.",
+          "displayName" : "Custom Threshold Pack",
+          "locale" : "en_US"
+        },
+        {
+          "description" : "カスタムで TGL 閾値を調整できるようになります。タスクの状態判定基準を自分好みに変更可能。",
+          "displayName" : "カスタム閾値パック",
+          "locale" : "ja"
+        }
+      ],
+      "productID" : "oikomi.unlock.thresholds",
+      "referenceName" : "Custom Threshold Pack",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_askToBuyEnabled" : false,
+    "_billingGracePeriodEnabled" : false,
+    "_billingIssuesEnabled" : false,
+    "_disableDialogs" : false,
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_renewalBillingIssuesEnabled" : false,
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+
+    ],
+    "_timeRate" : 0
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 5,
+    "minor" : 0
+  }
+}

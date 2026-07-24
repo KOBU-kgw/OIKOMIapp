@@ -175,6 +175,44 @@ void main() {
       expect(fromShuffled, baseline);
     });
 
+    test('preceding load can reorder tasks vs v1.4 (slack補正)', () {
+      // B: 締切は遠いが、先行タスク群に時間を食われて実質逼迫している
+      final b = _makeTask(
+        id: 'b',
+        deadline: now.add(const Duration(hours: 60)),
+        requiredHours: 4,
+        avoidance: 8,
+        createdAt: now.subtract(const Duration(days: 1)),
+      );
+      // C: Bより少し逼迫して見える（v1.4なら上に来る）が、先行負荷なし
+      final c = _makeTask(
+        id: 'c',
+        deadline: now.add(const Duration(hours: 100)),
+        requiredHours: 6,
+        avoidance: 9,
+        createdAt: now.subtract(const Duration(days: 2)),
+      );
+      // Bに先行する重いタスク群（締切60h未満）
+      final blockers = List.generate(3, (i) {
+        return _makeTask(
+          id: 'blocker-$i',
+          deadline: now.add(Duration(hours: 10 + i * 5)),
+          requiredHours: 8,
+          avoidance: 5,
+          createdAt: now.subtract(const Duration(days: 3)),
+        );
+      });
+
+      final result = partitionAndSortTasks(
+        [c, b, ...blockers],
+        TaskSortOrder.tgl,
+        now: now,
+      );
+      final ids = result.active.map((t) => t.id).toList();
+      // 先行負荷24hを差し引かれたBは、負荷8h相当のCより逼迫扱いになる
+      expect(ids.indexOf('b'), lessThan(ids.indexOf('c')));
+    });
+
     test('does not mutate the input list', () {
       final a = _makeTask(
         id: 'a',

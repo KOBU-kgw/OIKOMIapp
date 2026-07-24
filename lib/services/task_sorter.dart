@@ -2,6 +2,7 @@ import '../models/task.dart';
 import '../models/task_sort_order.dart';
 import '../models/tgl_state.dart';
 import 'tgl_calculator.dart';
+import 'tgl_context.dart';
 
 /// TGL差がこの幅未満のタスクは同順位とみなし、作成日時順で並べる
 const double kTglTieTolerance = 0.05;
@@ -17,17 +18,21 @@ const double kTglTieTolerance = 0.05;
   DateTime? now,
 }) {
   final reference = now ?? DateTime.now();
+  final ctx = TglContext.of(tasks); // 先行負荷（v1.5 slack補正）を一括計算
 
   final overdue = <Task>[];
   final entries = <({Task task, int tglBucket})>[];
   for (final task in tasks) {
-    if (taskToState(task, now: reference) == TGLState.overdue) {
+    final load = ctx.loadFor(task);
+    if (taskToState(task, now: reference, precedingLoad: load) ==
+        TGLState.overdue) {
       overdue.add(task);
     } else {
       entries.add((
         task: task,
-        tglBucket:
-            (calculateTGL(task, now: reference) / kTglTieTolerance).round(),
+        tglBucket: (calculateTGL(task, now: reference, precedingLoad: load) /
+                kTglTieTolerance)
+            .round(),
       ));
     }
   }

@@ -6,6 +6,8 @@ import 'package:timezone/timezone.dart' as tz;
 import 'l10n/app_localizations.dart';
 import 'services/database_service.dart';
 import 'services/notification_service.dart';
+import 'services/purchase_service.dart';
+import 'services/threshold_provider.dart';
 import 'screens/task_list_screen.dart';
 import 'screens/onboarding_screen.dart';
 
@@ -22,6 +24,10 @@ Future<void> main() async {
   }
   await DatabaseService.init();
   await NotificationService.init();
+  await _seedFirstLaunchAt();
+  await ThresholdProvider.reload();
+  // first frame 前に初期化する（iOS起動時に配送される保留トランザクション対策）
+  await PurchaseService().initialize();
 
   final prefs = await SharedPreferences.getInstance();
   final onboardingCompleted = prefs.getBool('onboarding_completed') ?? false;
@@ -33,6 +39,16 @@ Future<void> main() async {
     await NotificationService.requestPermission();
     await _onAppLaunch();
   });
+}
+
+/// 転換導線（FEAT-03）用の初回起動日時。未設定なら今を記録する。
+/// v1.4以前からの更新ユーザーも更新時点から起算する（ナッジは新機能の告知のため）。
+Future<void> _seedFirstLaunchAt() async {
+  final pref = await DatabaseService.getUserPreference();
+  if (pref.firstLaunchAt == null) {
+    pref.firstLaunchAt = DateTime.now();
+    await DatabaseService.saveUserPreference(pref);
+  }
 }
 
 Future<void> _onAppLaunch() async {

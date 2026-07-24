@@ -227,22 +227,103 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsUrlError => 'URLを開けませんでした';
 
   @override
-  String get settingsSectionPremium => 'Premium';
+  String get settingsSectionThresholdPack => 'カスタム閾値';
 
   @override
   String get settingsRestorePurchase => '購入を復元';
 
   @override
-  String get settingsPremiumUpgrade => 'Premiumにアップグレード';
+  String get settingsCustomThresholds => 'カスタム閾値';
 
   @override
-  String get settingsPremiumCustomThreshold => 'カスタム TGL閾値';
+  String get settingsCustomThresholdsLocked => '未購入';
 
   @override
-  String get settingsPremiumComingSoonTitle => '近日公開';
+  String get purchaseScreenTitle => 'カスタム閾値パック';
 
   @override
-  String get settingsPremiumComingSoonBody => 'Premium機能は今後のアップデートで追加予定です。';
+  String get purchaseHeadline => '「戦争」が始まるラインを、あなた仕様に。';
+
+  @override
+  String get purchaseBody => '「まだ平和」から「戦争」まで、5段階のラインをあなた仕様に調整できるようになります。';
+
+  @override
+  String get purchaseOneTime => '一度の購入で永続利用できます';
+
+  @override
+  String get purchaseScopeNote =>
+      '対象はカスタム閾値機能です。タスク管理・通知などの基本機能は無料のままご利用いただけます。';
+
+  @override
+  String purchaseButton(String price) {
+    return '$price で購入';
+  }
+
+  @override
+  String get purchaseUnavailable => 'ストアに接続できません';
+
+  @override
+  String get purchaseSuccess => 'カスタム閾値が解放されました！';
+
+  @override
+  String get purchaseRestoreDone => '購入情報を確認しました';
+
+  @override
+  String get purchaseErrorGeneric => '購入処理でエラーが発生しました';
+
+  @override
+  String get thresholdEditorTitle => 'カスタム閾値';
+
+  @override
+  String get thresholdEditorPreviewTitle => 'カスタム閾値プレビュー';
+
+  @override
+  String get thresholdEditorIntro => 'あなたの「戦争」が始まるラインを決めよう';
+
+  @override
+  String get thresholdEditorUseCustom => 'カスタム閾値を使う';
+
+  @override
+  String get thresholdLabelPeaceful => 'まだ平和 → いつかやる';
+
+  @override
+  String get thresholdLabelSomeday => 'いつかやる → 現実見ろ';
+
+  @override
+  String get thresholdLabelReality => '現実見ろ → 逃げ場なし';
+
+  @override
+  String get thresholdLabelNoEscape => '逃げ場なし → 戦争';
+
+  @override
+  String get thresholdReset => 'デフォルトに戻す';
+
+  @override
+  String get thresholdSave => '保存';
+
+  @override
+  String get thresholdSaved => '閾値を保存しました';
+
+  @override
+  String get thresholdPreviewHint => 'サンプル課題のラベルがどう変わるか確認できます';
+
+  @override
+  String get thresholdPreviewLockedNote => '保存にはカスタム閾値パックの購入が必要です';
+
+  @override
+  String get thresholdSampleTaskNear => '明日締切のレポート';
+
+  @override
+  String get thresholdSampleTaskMid => '3日後の小テスト対策';
+
+  @override
+  String get thresholdSampleTaskFar => '来週の期末レポート';
+
+  @override
+  String get nudgeCardTitle => '「戦争」が始まるタイミング、人によって違うらしい。';
+
+  @override
+  String get nudgeCardSubtitle => 'タップしてラインを調整してみる';
 
   @override
   String get taskDetailTitle => '課題詳細';
@@ -301,8 +382,8 @@ class AppLocalizationsJa extends AppLocalizations {
   String get whatsNewClose => 'OK';
 
   @override
-  String get whatsNewItem1 => '通知タイミングを改善 — 睡眠時間を除外した実効稼働時間で計算';
+  String get whatsNewItem1 => 'ヤバさ計算を強化 — 先に締め切られる他の課題の分も考慮するように';
 
   @override
-  String get whatsNewItem2 => 'ソート切り替えボタンを追加 — TGL順と締切順をワンタップで切替';
+  String get whatsNewItem2 => 'カスタム閾値パック登場 — 「戦争」が始まるラインを自分仕様に調整（設定から）';
 }

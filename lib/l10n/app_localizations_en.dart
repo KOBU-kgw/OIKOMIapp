@@ -228,23 +228,107 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsUrlError => 'Could not open URL';
 
   @override
-  String get settingsSectionPremium => 'Premium';
+  String get settingsSectionThresholdPack => 'Custom Thresholds';
 
   @override
   String get settingsRestorePurchase => 'Restore Purchase';
 
   @override
-  String get settingsPremiumUpgrade => 'Upgrade to Premium';
+  String get settingsCustomThresholds => 'Custom Thresholds';
 
   @override
-  String get settingsPremiumCustomThreshold => 'Custom TGL Thresholds';
+  String get settingsCustomThresholdsLocked => 'Not purchased';
 
   @override
-  String get settingsPremiumComingSoonTitle => 'Coming Soon';
+  String get purchaseScreenTitle => 'Custom Threshold Pack';
 
   @override
-  String get settingsPremiumComingSoonBody =>
-      'Premium features will be added in a future update.';
+  String get purchaseHeadline => 'Decide when your \"War\" begins.';
+
+  @override
+  String get purchaseBody =>
+      'Tune all five state boundaries — from \"Still Peaceful\" to \"War\" — to match how you actually work.';
+
+  @override
+  String get purchaseOneTime => 'One-time purchase, yours forever';
+
+  @override
+  String get purchaseScopeNote =>
+      'This unlocks the custom threshold feature. Task management and notifications stay free.';
+
+  @override
+  String purchaseButton(String price) {
+    return 'Buy for $price';
+  }
+
+  @override
+  String get purchaseUnavailable => 'Store is unavailable';
+
+  @override
+  String get purchaseSuccess => 'Custom thresholds unlocked!';
+
+  @override
+  String get purchaseRestoreDone => 'Purchases checked';
+
+  @override
+  String get purchaseErrorGeneric => 'Something went wrong with the purchase';
+
+  @override
+  String get thresholdEditorTitle => 'Custom Thresholds';
+
+  @override
+  String get thresholdEditorPreviewTitle => 'Threshold Preview';
+
+  @override
+  String get thresholdEditorIntro => 'Decide when your \"War\" begins';
+
+  @override
+  String get thresholdEditorUseCustom => 'Use custom thresholds';
+
+  @override
+  String get thresholdLabelPeaceful => 'Still Peaceful → Someday';
+
+  @override
+  String get thresholdLabelSomeday => 'Someday → Get Real';
+
+  @override
+  String get thresholdLabelReality => 'Get Real → No Escape';
+
+  @override
+  String get thresholdLabelNoEscape => 'No Escape → War';
+
+  @override
+  String get thresholdReset => 'Reset to defaults';
+
+  @override
+  String get thresholdSave => 'Save';
+
+  @override
+  String get thresholdSaved => 'Thresholds saved';
+
+  @override
+  String get thresholdPreviewHint =>
+      'See how the labels of sample tasks change';
+
+  @override
+  String get thresholdPreviewLockedNote =>
+      'Purchase the Custom Threshold Pack to save';
+
+  @override
+  String get thresholdSampleTaskNear => 'Report due tomorrow';
+
+  @override
+  String get thresholdSampleTaskMid => 'Quiz prep in 3 days';
+
+  @override
+  String get thresholdSampleTaskFar => 'Final report next week';
+
+  @override
+  String get nudgeCardTitle =>
+      'Turns out \"War\" starts at a different time for everyone.';
+
+  @override
+  String get nudgeCardSubtitle => 'Tap to tune your own thresholds';
 
   @override
   String get taskDetailTitle => 'Task Detail';
@@ -304,9 +388,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get whatsNewItem1 =>
-      'Improved notification timing — now based on active hours (excludes sleep)';
+      'Smarter urgency — now accounts for other tasks due before each one';
 
   @override
   String get whatsNewItem2 =>
-      'Sort toggle button — switch between TGL and deadline order with one tap';
+      'Custom Threshold Pack — tune when your \"War\" begins (see Settings)';
 }

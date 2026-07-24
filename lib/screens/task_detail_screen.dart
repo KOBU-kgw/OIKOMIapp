@@ -8,6 +8,7 @@ import '../models/tgl_state.dart';
 import '../services/database_service.dart';
 import '../services/notification_service.dart';
 import '../services/tgl_calculator.dart';
+import '../services/tgl_context.dart';
 import '../widgets/adaptive/adaptive_app_bar.dart';
 import '../widgets/adaptive/adaptive_button.dart';
 import '../widgets/task_form_widgets.dart';
@@ -28,6 +29,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   late int _timeIndex;
   late int _avoidance;
 
+  /// 先行タスク負荷（v1.5 slack補正）。initStateで非同期取得するまでは0。
+  double _precedingLoad = 0.0;
+
   static const int _timeStepMinutes = 15;
   static const int _timeSteps = 96;
 
@@ -40,6 +44,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     _deadline = t.deadline;
     _timeIndex = ((t.requiredHours * 60) / _timeStepMinutes).round() - 1;
     _avoidance = t.avoidance;
+    _loadPrecedingLoad();
+  }
+
+  Future<void> _loadPrecedingLoad() async {
+    final tasks = await DatabaseService.getAllIncompleteTasks();
+    if (!mounted) return;
+    setState(() => _precedingLoad = TglContext.of(tasks).loadFor(widget.task));
   }
 
   @override
@@ -119,7 +130,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       ..completedAt = widget.task.completedAt;
 
     await DatabaseService.saveTask(task);
-    await NotificationService.resyncFromDatabase();
+    NotificationService.requestResync();
 
     if (mounted) Navigator.pop(context);
   }
@@ -129,7 +140,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     final messenger = ScaffoldMessenger.of(context);
     final taskId = widget.task.id;
     await DatabaseService.markCompleted(taskId);
-    await NotificationService.resyncFromDatabase();
+    NotificationService.requestResync();
     if (!mounted) return;
     Navigator.pop(context);
     messenger.showSnackBar(
@@ -140,7 +151,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
           label: l.undoButton,
           onPressed: () async {
             await DatabaseService.undoComplete(taskId);
-            await NotificationService.resyncFromDatabase();
+            NotificationService.requestResync();
           },
         ),
       ),
@@ -152,7 +163,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     final messenger = ScaffoldMessenger.of(context);
     final taskId = widget.task.id;
     await DatabaseService.softDeleteTask(taskId);
-    await NotificationService.resyncFromDatabase();
+    NotificationService.requestResync();
     if (!mounted) return;
     Navigator.pop(context);
     messenger.showSnackBar(
@@ -163,7 +174,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
           label: l.undoButton,
           onPressed: () async {
             await DatabaseService.undoDeleteTask(taskId);
-            await NotificationService.resyncFromDatabase();
+            NotificationService.requestResync();
           },
         ),
       ),
@@ -173,7 +184,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
-    final state = taskToState(widget.task);
+    final state = taskToState(widget.task, precedingLoad: _precedingLoad);
     final isOverdue = state == TGLState.overdue;
 
     final deadlineText =

@@ -17,45 +17,50 @@ const UserPreferenceSchema = CollectionSchema(
   name: r'UserPreference',
   id: 916664336621196308,
   properties: {
-    r'isPremiumActive': PropertySchema(
+    r'customNoEscape': PropertySchema(
       id: 0,
-      name: r'isPremiumActive',
-      type: IsarType.bool,
+      name: r'customNoEscape',
+      type: IsarType.double,
     ),
-    r'lastPremiumCheckAt': PropertySchema(
+    r'customPeaceful': PropertySchema(
       id: 1,
-      name: r'lastPremiumCheckAt',
+      name: r'customPeaceful',
+      type: IsarType.double,
+    ),
+    r'customReality': PropertySchema(
+      id: 2,
+      name: r'customReality',
+      type: IsarType.double,
+    ),
+    r'customSomeday': PropertySchema(
+      id: 3,
+      name: r'customSomeday',
+      type: IsarType.double,
+    ),
+    r'firstLaunchAt': PropertySchema(
+      id: 4,
+      name: r'firstLaunchAt',
       type: IsarType.dateTime,
     ),
+    r'isThresholdsUnlocked': PropertySchema(
+      id: 5,
+      name: r'isThresholdsUnlocked',
+      type: IsarType.bool,
+    ),
     r'lastPurchaseId': PropertySchema(
-      id: 2,
+      id: 6,
       name: r'lastPurchaseId',
       type: IsarType.string,
     ),
-    r'subscriptionExpiryDate': PropertySchema(
-      id: 3,
-      name: r'subscriptionExpiryDate',
-      type: IsarType.dateTime,
-    ),
-    r'thresholdNoEscape': PropertySchema(
-      id: 4,
-      name: r'thresholdNoEscape',
-      type: IsarType.double,
-    ),
-    r'thresholdPeaceful': PropertySchema(
-      id: 5,
-      name: r'thresholdPeaceful',
-      type: IsarType.double,
-    ),
-    r'thresholdReality': PropertySchema(
-      id: 6,
-      name: r'thresholdReality',
-      type: IsarType.double,
-    ),
-    r'thresholdSomeday': PropertySchema(
+    r'nudgeShownCountRaw': PropertySchema(
       id: 7,
-      name: r'thresholdSomeday',
-      type: IsarType.double,
+      name: r'nudgeShownCountRaw',
+      type: IsarType.long,
+    ),
+    r'useCustomThresholds': PropertySchema(
+      id: 8,
+      name: r'useCustomThresholds',
+      type: IsarType.bool,
     )
   },
   estimateSize: _userPreferenceEstimateSize,
@@ -93,14 +98,15 @@ void _userPreferenceSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeBool(offsets[0], object.isPremiumActive);
-  writer.writeDateTime(offsets[1], object.lastPremiumCheckAt);
-  writer.writeString(offsets[2], object.lastPurchaseId);
-  writer.writeDateTime(offsets[3], object.subscriptionExpiryDate);
-  writer.writeDouble(offsets[4], object.thresholdNoEscape);
-  writer.writeDouble(offsets[5], object.thresholdPeaceful);
-  writer.writeDouble(offsets[6], object.thresholdReality);
-  writer.writeDouble(offsets[7], object.thresholdSomeday);
+  writer.writeDouble(offsets[0], object.customNoEscape);
+  writer.writeDouble(offsets[1], object.customPeaceful);
+  writer.writeDouble(offsets[2], object.customReality);
+  writer.writeDouble(offsets[3], object.customSomeday);
+  writer.writeDateTime(offsets[4], object.firstLaunchAt);
+  writer.writeBool(offsets[5], object.isThresholdsUnlocked);
+  writer.writeString(offsets[6], object.lastPurchaseId);
+  writer.writeLong(offsets[7], object.nudgeShownCountRaw);
+  writer.writeBool(offsets[8], object.useCustomThresholds);
 }
 
 UserPreference _userPreferenceDeserialize(
@@ -110,15 +116,16 @@ UserPreference _userPreferenceDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = UserPreference();
+  object.customNoEscape = reader.readDoubleOrNull(offsets[0]);
+  object.customPeaceful = reader.readDoubleOrNull(offsets[1]);
+  object.customReality = reader.readDoubleOrNull(offsets[2]);
+  object.customSomeday = reader.readDoubleOrNull(offsets[3]);
+  object.firstLaunchAt = reader.readDateTimeOrNull(offsets[4]);
   object.id = id;
-  object.isPremiumActive = reader.readBool(offsets[0]);
-  object.lastPremiumCheckAt = reader.readDateTimeOrNull(offsets[1]);
-  object.lastPurchaseId = reader.readStringOrNull(offsets[2]);
-  object.subscriptionExpiryDate = reader.readDateTimeOrNull(offsets[3]);
-  object.thresholdNoEscape = reader.readDoubleOrNull(offsets[4]);
-  object.thresholdPeaceful = reader.readDoubleOrNull(offsets[5]);
-  object.thresholdReality = reader.readDoubleOrNull(offsets[6]);
-  object.thresholdSomeday = reader.readDoubleOrNull(offsets[7]);
+  object.isThresholdsUnlocked = reader.readBool(offsets[5]);
+  object.lastPurchaseId = reader.readStringOrNull(offsets[6]);
+  object.nudgeShownCountRaw = reader.readLongOrNull(offsets[7]);
+  object.useCustomThresholds = reader.readBool(offsets[8]);
   return object;
 }
 
@@ -130,21 +137,23 @@ P _userPreferenceDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readBool(offset)) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 1:
-      return (reader.readDateTimeOrNull(offset)) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 2:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 3:
-      return (reader.readDateTimeOrNull(offset)) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 4:
-      return (reader.readDoubleOrNull(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 5:
-      return (reader.readDoubleOrNull(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 6:
-      return (reader.readDoubleOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 7:
-      return (reader.readDoubleOrNull(offset)) as P;
+      return (reader.readLongOrNull(offset)) as P;
+    case 8:
+      return (reader.readBool(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -246,6 +255,416 @@ extension UserPreferenceQueryWhere
 
 extension UserPreferenceQueryFilter
     on QueryBuilder<UserPreference, UserPreference, QFilterCondition> {
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customNoEscapeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'customNoEscape',
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customNoEscapeIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'customNoEscape',
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customNoEscapeEqualTo(
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'customNoEscape',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customNoEscapeGreaterThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'customNoEscape',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customNoEscapeLessThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'customNoEscape',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customNoEscapeBetween(
+    double? lower,
+    double? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'customNoEscape',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customPeacefulIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'customPeaceful',
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customPeacefulIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'customPeaceful',
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customPeacefulEqualTo(
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'customPeaceful',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customPeacefulGreaterThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'customPeaceful',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customPeacefulLessThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'customPeaceful',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customPeacefulBetween(
+    double? lower,
+    double? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'customPeaceful',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customRealityIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'customReality',
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customRealityIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'customReality',
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customRealityEqualTo(
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'customReality',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customRealityGreaterThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'customReality',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customRealityLessThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'customReality',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customRealityBetween(
+    double? lower,
+    double? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'customReality',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customSomedayIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'customSomeday',
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customSomedayIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'customSomeday',
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customSomedayEqualTo(
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'customSomeday',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customSomedayGreaterThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'customSomeday',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customSomedayLessThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'customSomeday',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      customSomedayBetween(
+    double? lower,
+    double? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'customSomeday',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      firstLaunchAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'firstLaunchAt',
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      firstLaunchAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'firstLaunchAt',
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      firstLaunchAtEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'firstLaunchAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      firstLaunchAtGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'firstLaunchAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      firstLaunchAtLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'firstLaunchAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
+      firstLaunchAtBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'firstLaunchAt',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition> idEqualTo(
       Id value) {
     return QueryBuilder.apply(this, (query) {
@@ -302,85 +721,11 @@ extension UserPreferenceQueryFilter
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      isPremiumActiveEqualTo(bool value) {
+      isThresholdsUnlockedEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'isPremiumActive',
+        property: r'isThresholdsUnlocked',
         value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      lastPremiumCheckAtIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'lastPremiumCheckAt',
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      lastPremiumCheckAtIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'lastPremiumCheckAt',
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      lastPremiumCheckAtEqualTo(DateTime? value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'lastPremiumCheckAt',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      lastPremiumCheckAtGreaterThan(
-    DateTime? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'lastPremiumCheckAt',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      lastPremiumCheckAtLessThan(
-    DateTime? value, {
-    bool include = false,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'lastPremiumCheckAt',
-        value: value,
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      lastPremiumCheckAtBetween(
-    DateTime? lower,
-    DateTime? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'lastPremiumCheckAt',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
       ));
     });
   }
@@ -540,71 +885,71 @@ extension UserPreferenceQueryFilter
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      subscriptionExpiryDateIsNull() {
+      nudgeShownCountRawIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'subscriptionExpiryDate',
+        property: r'nudgeShownCountRaw',
       ));
     });
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      subscriptionExpiryDateIsNotNull() {
+      nudgeShownCountRawIsNotNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'subscriptionExpiryDate',
+        property: r'nudgeShownCountRaw',
       ));
     });
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      subscriptionExpiryDateEqualTo(DateTime? value) {
+      nudgeShownCountRawEqualTo(int? value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'subscriptionExpiryDate',
+        property: r'nudgeShownCountRaw',
         value: value,
       ));
     });
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      subscriptionExpiryDateGreaterThan(
-    DateTime? value, {
+      nudgeShownCountRawGreaterThan(
+    int? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'subscriptionExpiryDate',
+        property: r'nudgeShownCountRaw',
         value: value,
       ));
     });
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      subscriptionExpiryDateLessThan(
-    DateTime? value, {
+      nudgeShownCountRawLessThan(
+    int? value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'subscriptionExpiryDate',
+        property: r'nudgeShownCountRaw',
         value: value,
       ));
     });
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      subscriptionExpiryDateBetween(
-    DateTime? lower,
-    DateTime? upper, {
+      nudgeShownCountRawBetween(
+    int? lower,
+    int? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'subscriptionExpiryDate',
+        property: r'nudgeShownCountRaw',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -614,337 +959,11 @@ extension UserPreferenceQueryFilter
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdNoEscapeIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'thresholdNoEscape',
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdNoEscapeIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'thresholdNoEscape',
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdNoEscapeEqualTo(
-    double? value, {
-    double epsilon = Query.epsilon,
-  }) {
+      useCustomThresholdsEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'thresholdNoEscape',
+        property: r'useCustomThresholds',
         value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdNoEscapeGreaterThan(
-    double? value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'thresholdNoEscape',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdNoEscapeLessThan(
-    double? value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'thresholdNoEscape',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdNoEscapeBetween(
-    double? lower,
-    double? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'thresholdNoEscape',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdPeacefulIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'thresholdPeaceful',
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdPeacefulIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'thresholdPeaceful',
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdPeacefulEqualTo(
-    double? value, {
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'thresholdPeaceful',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdPeacefulGreaterThan(
-    double? value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'thresholdPeaceful',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdPeacefulLessThan(
-    double? value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'thresholdPeaceful',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdPeacefulBetween(
-    double? lower,
-    double? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'thresholdPeaceful',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdRealityIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'thresholdReality',
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdRealityIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'thresholdReality',
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdRealityEqualTo(
-    double? value, {
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'thresholdReality',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdRealityGreaterThan(
-    double? value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'thresholdReality',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdRealityLessThan(
-    double? value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'thresholdReality',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdRealityBetween(
-    double? lower,
-    double? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'thresholdReality',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdSomedayIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'thresholdSomeday',
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdSomedayIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'thresholdSomeday',
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdSomedayEqualTo(
-    double? value, {
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'thresholdSomeday',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdSomedayGreaterThan(
-    double? value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'thresholdSomeday',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdSomedayLessThan(
-    double? value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'thresholdSomeday',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterFilterCondition>
-      thresholdSomedayBetween(
-    double? lower,
-    double? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'thresholdSomeday',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        epsilon: epsilon,
       ));
     });
   }
@@ -959,30 +978,86 @@ extension UserPreferenceQueryLinks
 extension UserPreferenceQuerySortBy
     on QueryBuilder<UserPreference, UserPreference, QSortBy> {
   QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      sortByIsPremiumActive() {
+      sortByCustomNoEscape() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'isPremiumActive', Sort.asc);
+      return query.addSortBy(r'customNoEscape', Sort.asc);
     });
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      sortByIsPremiumActiveDesc() {
+      sortByCustomNoEscapeDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'isPremiumActive', Sort.desc);
+      return query.addSortBy(r'customNoEscape', Sort.desc);
     });
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      sortByLastPremiumCheckAt() {
+      sortByCustomPeaceful() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'lastPremiumCheckAt', Sort.asc);
+      return query.addSortBy(r'customPeaceful', Sort.asc);
     });
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      sortByLastPremiumCheckAtDesc() {
+      sortByCustomPeacefulDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'lastPremiumCheckAt', Sort.desc);
+      return query.addSortBy(r'customPeaceful', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
+      sortByCustomReality() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'customReality', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
+      sortByCustomRealityDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'customReality', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
+      sortByCustomSomeday() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'customSomeday', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
+      sortByCustomSomedayDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'customSomeday', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
+      sortByFirstLaunchAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'firstLaunchAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
+      sortByFirstLaunchAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'firstLaunchAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
+      sortByIsThresholdsUnlocked() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isThresholdsUnlocked', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
+      sortByIsThresholdsUnlockedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isThresholdsUnlocked', Sort.desc);
     });
   }
 
@@ -1001,78 +1076,106 @@ extension UserPreferenceQuerySortBy
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      sortBySubscriptionExpiryDate() {
+      sortByNudgeShownCountRaw() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'subscriptionExpiryDate', Sort.asc);
+      return query.addSortBy(r'nudgeShownCountRaw', Sort.asc);
     });
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      sortBySubscriptionExpiryDateDesc() {
+      sortByNudgeShownCountRawDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'subscriptionExpiryDate', Sort.desc);
+      return query.addSortBy(r'nudgeShownCountRaw', Sort.desc);
     });
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      sortByThresholdNoEscape() {
+      sortByUseCustomThresholds() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'thresholdNoEscape', Sort.asc);
+      return query.addSortBy(r'useCustomThresholds', Sort.asc);
     });
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      sortByThresholdNoEscapeDesc() {
+      sortByUseCustomThresholdsDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'thresholdNoEscape', Sort.desc);
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      sortByThresholdPeaceful() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'thresholdPeaceful', Sort.asc);
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      sortByThresholdPeacefulDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'thresholdPeaceful', Sort.desc);
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      sortByThresholdReality() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'thresholdReality', Sort.asc);
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      sortByThresholdRealityDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'thresholdReality', Sort.desc);
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      sortByThresholdSomeday() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'thresholdSomeday', Sort.asc);
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      sortByThresholdSomedayDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'thresholdSomeday', Sort.desc);
+      return query.addSortBy(r'useCustomThresholds', Sort.desc);
     });
   }
 }
 
 extension UserPreferenceQuerySortThenBy
     on QueryBuilder<UserPreference, UserPreference, QSortThenBy> {
+  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
+      thenByCustomNoEscape() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'customNoEscape', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
+      thenByCustomNoEscapeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'customNoEscape', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
+      thenByCustomPeaceful() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'customPeaceful', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
+      thenByCustomPeacefulDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'customPeaceful', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
+      thenByCustomReality() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'customReality', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
+      thenByCustomRealityDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'customReality', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
+      thenByCustomSomeday() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'customSomeday', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
+      thenByCustomSomedayDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'customSomeday', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
+      thenByFirstLaunchAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'firstLaunchAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
+      thenByFirstLaunchAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'firstLaunchAt', Sort.desc);
+    });
+  }
+
   QueryBuilder<UserPreference, UserPreference, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -1086,30 +1189,16 @@ extension UserPreferenceQuerySortThenBy
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      thenByIsPremiumActive() {
+      thenByIsThresholdsUnlocked() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'isPremiumActive', Sort.asc);
+      return query.addSortBy(r'isThresholdsUnlocked', Sort.asc);
     });
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      thenByIsPremiumActiveDesc() {
+      thenByIsThresholdsUnlockedDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'isPremiumActive', Sort.desc);
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      thenByLastPremiumCheckAt() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'lastPremiumCheckAt', Sort.asc);
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      thenByLastPremiumCheckAtDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'lastPremiumCheckAt', Sort.desc);
+      return query.addSortBy(r'isThresholdsUnlocked', Sort.desc);
     });
   }
 
@@ -1128,72 +1217,30 @@ extension UserPreferenceQuerySortThenBy
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      thenBySubscriptionExpiryDate() {
+      thenByNudgeShownCountRaw() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'subscriptionExpiryDate', Sort.asc);
+      return query.addSortBy(r'nudgeShownCountRaw', Sort.asc);
     });
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      thenBySubscriptionExpiryDateDesc() {
+      thenByNudgeShownCountRawDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'subscriptionExpiryDate', Sort.desc);
+      return query.addSortBy(r'nudgeShownCountRaw', Sort.desc);
     });
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      thenByThresholdNoEscape() {
+      thenByUseCustomThresholds() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'thresholdNoEscape', Sort.asc);
+      return query.addSortBy(r'useCustomThresholds', Sort.asc);
     });
   }
 
   QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      thenByThresholdNoEscapeDesc() {
+      thenByUseCustomThresholdsDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'thresholdNoEscape', Sort.desc);
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      thenByThresholdPeaceful() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'thresholdPeaceful', Sort.asc);
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      thenByThresholdPeacefulDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'thresholdPeaceful', Sort.desc);
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      thenByThresholdReality() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'thresholdReality', Sort.asc);
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      thenByThresholdRealityDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'thresholdReality', Sort.desc);
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      thenByThresholdSomeday() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'thresholdSomeday', Sort.asc);
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QAfterSortBy>
-      thenByThresholdSomedayDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'thresholdSomeday', Sort.desc);
+      return query.addSortBy(r'useCustomThresholds', Sort.desc);
     });
   }
 }
@@ -1201,16 +1248,44 @@ extension UserPreferenceQuerySortThenBy
 extension UserPreferenceQueryWhereDistinct
     on QueryBuilder<UserPreference, UserPreference, QDistinct> {
   QueryBuilder<UserPreference, UserPreference, QDistinct>
-      distinctByIsPremiumActive() {
+      distinctByCustomNoEscape() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'isPremiumActive');
+      return query.addDistinctBy(r'customNoEscape');
     });
   }
 
   QueryBuilder<UserPreference, UserPreference, QDistinct>
-      distinctByLastPremiumCheckAt() {
+      distinctByCustomPeaceful() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'lastPremiumCheckAt');
+      return query.addDistinctBy(r'customPeaceful');
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QDistinct>
+      distinctByCustomReality() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'customReality');
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QDistinct>
+      distinctByCustomSomeday() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'customSomeday');
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QDistinct>
+      distinctByFirstLaunchAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'firstLaunchAt');
+    });
+  }
+
+  QueryBuilder<UserPreference, UserPreference, QDistinct>
+      distinctByIsThresholdsUnlocked() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isThresholdsUnlocked');
     });
   }
 
@@ -1223,37 +1298,16 @@ extension UserPreferenceQueryWhereDistinct
   }
 
   QueryBuilder<UserPreference, UserPreference, QDistinct>
-      distinctBySubscriptionExpiryDate() {
+      distinctByNudgeShownCountRaw() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'subscriptionExpiryDate');
+      return query.addDistinctBy(r'nudgeShownCountRaw');
     });
   }
 
   QueryBuilder<UserPreference, UserPreference, QDistinct>
-      distinctByThresholdNoEscape() {
+      distinctByUseCustomThresholds() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'thresholdNoEscape');
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QDistinct>
-      distinctByThresholdPeaceful() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'thresholdPeaceful');
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QDistinct>
-      distinctByThresholdReality() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'thresholdReality');
-    });
-  }
-
-  QueryBuilder<UserPreference, UserPreference, QDistinct>
-      distinctByThresholdSomeday() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'thresholdSomeday');
+      return query.addDistinctBy(r'useCustomThresholds');
     });
   }
 }
@@ -1266,17 +1320,45 @@ extension UserPreferenceQueryProperty
     });
   }
 
-  QueryBuilder<UserPreference, bool, QQueryOperations>
-      isPremiumActiveProperty() {
+  QueryBuilder<UserPreference, double?, QQueryOperations>
+      customNoEscapeProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'isPremiumActive');
+      return query.addPropertyName(r'customNoEscape');
+    });
+  }
+
+  QueryBuilder<UserPreference, double?, QQueryOperations>
+      customPeacefulProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'customPeaceful');
+    });
+  }
+
+  QueryBuilder<UserPreference, double?, QQueryOperations>
+      customRealityProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'customReality');
+    });
+  }
+
+  QueryBuilder<UserPreference, double?, QQueryOperations>
+      customSomedayProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'customSomeday');
     });
   }
 
   QueryBuilder<UserPreference, DateTime?, QQueryOperations>
-      lastPremiumCheckAtProperty() {
+      firstLaunchAtProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'lastPremiumCheckAt');
+      return query.addPropertyName(r'firstLaunchAt');
+    });
+  }
+
+  QueryBuilder<UserPreference, bool, QQueryOperations>
+      isThresholdsUnlockedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isThresholdsUnlocked');
     });
   }
 
@@ -1287,38 +1369,17 @@ extension UserPreferenceQueryProperty
     });
   }
 
-  QueryBuilder<UserPreference, DateTime?, QQueryOperations>
-      subscriptionExpiryDateProperty() {
+  QueryBuilder<UserPreference, int?, QQueryOperations>
+      nudgeShownCountRawProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'subscriptionExpiryDate');
+      return query.addPropertyName(r'nudgeShownCountRaw');
     });
   }
 
-  QueryBuilder<UserPreference, double?, QQueryOperations>
-      thresholdNoEscapeProperty() {
+  QueryBuilder<UserPreference, bool, QQueryOperations>
+      useCustomThresholdsProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'thresholdNoEscape');
-    });
-  }
-
-  QueryBuilder<UserPreference, double?, QQueryOperations>
-      thresholdPeacefulProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'thresholdPeaceful');
-    });
-  }
-
-  QueryBuilder<UserPreference, double?, QQueryOperations>
-      thresholdRealityProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'thresholdReality');
-    });
-  }
-
-  QueryBuilder<UserPreference, double?, QQueryOperations>
-      thresholdSomedayProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'thresholdSomeday');
+      return query.addPropertyName(r'useCustomThresholds');
     });
   }
 }

@@ -518,11 +518,11 @@ abstract class AppLocalizations {
   /// **'Could not open URL'**
   String get settingsUrlError;
 
-  /// No description provided for @settingsSectionPremium.
+  /// No description provided for @settingsSectionThresholdPack.
   ///
   /// In en, this message translates to:
-  /// **'Premium'**
-  String get settingsSectionPremium;
+  /// **'Custom Thresholds'**
+  String get settingsSectionThresholdPack;
 
   /// No description provided for @settingsRestorePurchase.
   ///
@@ -530,29 +530,185 @@ abstract class AppLocalizations {
   /// **'Restore Purchase'**
   String get settingsRestorePurchase;
 
-  /// No description provided for @settingsPremiumUpgrade.
+  /// No description provided for @settingsCustomThresholds.
   ///
   /// In en, this message translates to:
-  /// **'Upgrade to Premium'**
-  String get settingsPremiumUpgrade;
+  /// **'Custom Thresholds'**
+  String get settingsCustomThresholds;
 
-  /// No description provided for @settingsPremiumCustomThreshold.
+  /// No description provided for @settingsCustomThresholdsLocked.
   ///
   /// In en, this message translates to:
-  /// **'Custom TGL Thresholds'**
-  String get settingsPremiumCustomThreshold;
+  /// **'Not purchased'**
+  String get settingsCustomThresholdsLocked;
 
-  /// No description provided for @settingsPremiumComingSoonTitle.
+  /// No description provided for @purchaseScreenTitle.
   ///
   /// In en, this message translates to:
-  /// **'Coming Soon'**
-  String get settingsPremiumComingSoonTitle;
+  /// **'Custom Threshold Pack'**
+  String get purchaseScreenTitle;
 
-  /// No description provided for @settingsPremiumComingSoonBody.
+  /// No description provided for @purchaseHeadline.
   ///
   /// In en, this message translates to:
-  /// **'Premium features will be added in a future update.'**
-  String get settingsPremiumComingSoonBody;
+  /// **'Decide when your \"War\" begins.'**
+  String get purchaseHeadline;
+
+  /// No description provided for @purchaseBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tune all five state boundaries — from \"Still Peaceful\" to \"War\" — to match how you actually work.'**
+  String get purchaseBody;
+
+  /// No description provided for @purchaseOneTime.
+  ///
+  /// In en, this message translates to:
+  /// **'One-time purchase, yours forever'**
+  String get purchaseOneTime;
+
+  /// No description provided for @purchaseScopeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This unlocks the custom threshold feature. Task management and notifications stay free.'**
+  String get purchaseScopeNote;
+
+  /// No description provided for @purchaseButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Buy for {price}'**
+  String purchaseButton(String price);
+
+  /// No description provided for @purchaseUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Store is unavailable'**
+  String get purchaseUnavailable;
+
+  /// No description provided for @purchaseSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom thresholds unlocked!'**
+  String get purchaseSuccess;
+
+  /// No description provided for @purchaseRestoreDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchases checked'**
+  String get purchaseRestoreDone;
+
+  /// No description provided for @purchaseErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong with the purchase'**
+  String get purchaseErrorGeneric;
+
+  /// No description provided for @thresholdEditorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Thresholds'**
+  String get thresholdEditorTitle;
+
+  /// No description provided for @thresholdEditorPreviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Threshold Preview'**
+  String get thresholdEditorPreviewTitle;
+
+  /// No description provided for @thresholdEditorIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Decide when your \"War\" begins'**
+  String get thresholdEditorIntro;
+
+  /// No description provided for @thresholdEditorUseCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Use custom thresholds'**
+  String get thresholdEditorUseCustom;
+
+  /// No description provided for @thresholdLabelPeaceful.
+  ///
+  /// In en, this message translates to:
+  /// **'Still Peaceful → Someday'**
+  String get thresholdLabelPeaceful;
+
+  /// No description provided for @thresholdLabelSomeday.
+  ///
+  /// In en, this message translates to:
+  /// **'Someday → Get Real'**
+  String get thresholdLabelSomeday;
+
+  /// No description provided for @thresholdLabelReality.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Real → No Escape'**
+  String get thresholdLabelReality;
+
+  /// No description provided for @thresholdLabelNoEscape.
+  ///
+  /// In en, this message translates to:
+  /// **'No Escape → War'**
+  String get thresholdLabelNoEscape;
+
+  /// No description provided for @thresholdReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to defaults'**
+  String get thresholdReset;
+
+  /// No description provided for @thresholdSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get thresholdSave;
+
+  /// No description provided for @thresholdSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Thresholds saved'**
+  String get thresholdSaved;
+
+  /// No description provided for @thresholdPreviewHint.
+  ///
+  /// In en, this message translates to:
+  /// **'See how the labels of sample tasks change'**
+  String get thresholdPreviewHint;
+
+  /// No description provided for @thresholdPreviewLockedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase the Custom Threshold Pack to save'**
+  String get thresholdPreviewLockedNote;
+
+  /// No description provided for @thresholdSampleTaskNear.
+  ///
+  /// In en, this message translates to:
+  /// **'Report due tomorrow'**
+  String get thresholdSampleTaskNear;
+
+  /// No description provided for @thresholdSampleTaskMid.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiz prep in 3 days'**
+  String get thresholdSampleTaskMid;
+
+  /// No description provided for @thresholdSampleTaskFar.
+  ///
+  /// In en, this message translates to:
+  /// **'Final report next week'**
+  String get thresholdSampleTaskFar;
+
+  /// No description provided for @nudgeCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Turns out \"War\" starts at a different time for everyone.'**
+  String get nudgeCardTitle;
+
+  /// No description provided for @nudgeCardSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to tune your own thresholds'**
+  String get nudgeCardSubtitle;
 
   /// No description provided for @taskDetailTitle.
   ///
@@ -665,13 +821,13 @@ abstract class AppLocalizations {
   /// No description provided for @whatsNewItem1.
   ///
   /// In en, this message translates to:
-  /// **'Improved notification timing — now based on active hours (excludes sleep)'**
+  /// **'Smarter urgency — now accounts for other tasks due before each one'**
   String get whatsNewItem1;
 
   /// No description provided for @whatsNewItem2.
   ///
   /// In en, this message translates to:
-  /// **'Sort toggle button — switch between TGL and deadline order with one tap'**
+  /// **'Custom Threshold Pack — tune when your \"War\" begins (see Settings)'**
   String get whatsNewItem2;
 }
 

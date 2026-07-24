@@ -97,12 +97,46 @@
   "settingsTermsOfService": "Terms of Service",
   "settingsSupport": "Support",
   "settingsUrlError": "Could not open URL",
-  "settingsSectionPremium": "Premium",
+  "settingsSectionThresholdPack": "Custom Thresholds",
   "settingsRestorePurchase": "Restore Purchase",
-  "settingsPremiumUpgrade": "Upgrade to Premium",
-  "settingsPremiumCustomThreshold": "Custom TGL Thresholds",
-  "settingsPremiumComingSoonTitle": "Coming Soon",
-  "settingsPremiumComingSoonBody": "Premium features will be added in a future update.",
+  "settingsCustomThresholds": "Custom Thresholds",
+  "settingsCustomThresholdsLocked": "Not purchased",
+
+  "purchaseScreenTitle": "Custom Threshold Pack",
+  "purchaseHeadline": "Decide when your \"War\" begins.",
+  "purchaseBody": "Tune all five state boundaries — from \"Still Peaceful\" to \"War\" — to match how you actually work.",
+  "purchaseOneTime": "One-time purchase, yours forever",
+  "purchaseScopeNote": "This unlocks the custom threshold feature. Task management and notifications stay free.",
+  "purchaseButton": "Buy for {price}",
+  "@purchaseButton": {
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
+  "purchaseUnavailable": "Store is unavailable",
+  "purchaseSuccess": "Custom thresholds unlocked!",
+  "purchaseRestoreDone": "Purchases checked",
+  "purchaseErrorGeneric": "Something went wrong with the purchase",
+
+  "thresholdEditorTitle": "Custom Thresholds",
+  "thresholdEditorPreviewTitle": "Threshold Preview",
+  "thresholdEditorIntro": "Decide when your \"War\" begins",
+  "thresholdEditorUseCustom": "Use custom thresholds",
+  "thresholdLabelPeaceful": "Still Peaceful → Someday",
+  "thresholdLabelSomeday": "Someday → Get Real",
+  "thresholdLabelReality": "Get Real → No Escape",
+  "thresholdLabelNoEscape": "No Escape → War",
+  "thresholdReset": "Reset to defaults",
+  "thresholdSave": "Save",
+  "thresholdSaved": "Thresholds saved",
+  "thresholdPreviewHint": "See how the labels of sample tasks change",
+  "thresholdPreviewLockedNote": "Purchase the Custom Threshold Pack to save",
+  "thresholdSampleTaskNear": "Report due tomorrow",
+  "thresholdSampleTaskMid": "Quiz prep in 3 days",
+  "thresholdSampleTaskFar": "Final report next week",
+
+  "nudgeCardTitle": "Turns out \"War\" starts at a different time for everyone.",
+  "nudgeCardSubtitle": "Tap to tune your own thresholds",
 
   "taskDetailTitle": "Task Detail",
   "deleteButton": "Delete",
@@ -129,6 +163,6 @@
     }
   },
   "whatsNewClose": "OK",
-  "whatsNewItem1": "Improved notification timing — now based on active hours (excludes sleep)",
-  "whatsNewItem2": "Sort toggle button — switch between TGL and deadline order with one tap"
+  "whatsNewItem1": "Smarter urgency — now accounts for other tasks due before each one",
+  "whatsNewItem2": "Custom Threshold Pack — tune when your \"War\" begins (see Settings)"
 }

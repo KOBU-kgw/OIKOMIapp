@@ -4,7 +4,10 @@ import 'package:url_launcher/url_launcher.dart';
 import '../app_version.dart';
 import '../l10n/app_localizations.dart';
 import '../services/notification_service.dart';
+import '../services/purchase_service.dart';
 import '../widgets/adaptive/adaptive_app_bar.dart';
+import 'purchase_screen.dart';
+import 'threshold_editor_screen.dart';
 
 const _privacyUrl = 'https://kobu-kgw.github.io/OIKOMIapp/privacy.html';
 const _termsUrl = 'https://kobu-kgw.github.io/OIKOMIapp/terms.html';
@@ -82,6 +85,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   l.settingsLanguageValue,
                   style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
                 ),
+              ),
+            ],
+          ),
+
+          // ─── カスタム閾値（v1.5 買い切りパック） ──────────────────
+          _SectionHeader(l.settingsSectionThresholdPack),
+          _SettingsCard(
+            children: [
+              ValueListenableBuilder(
+                valueListenable: PurchaseService().isUnlocked,
+                builder: (context, unlocked, _) {
+                  return ListTile(
+                    title: Text(l.settingsCustomThresholds),
+                    subtitle: unlocked
+                        ? null
+                        : Text(
+                            l.settingsCustomThresholdsLocked,
+                            style: TextStyle(
+                                fontSize: 12, color: Colors.grey.shade500),
+                          ),
+                    trailing:
+                        const Icon(Icons.chevron_right, color: Colors.grey),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => unlocked
+                            ? const ThresholdEditorScreen()
+                            : const PurchaseScreen(),
+                      ),
+                    ),
+                  );
+                },
               ),
             ],
           ),

@@ -8,12 +8,17 @@ import '../models/task_sort_order.dart';
 import '../models/tgl_state.dart';
 import '../services/database_service.dart';
 import '../services/notification_service.dart';
+import '../services/nudge_logic.dart';
+import '../services/purchase_service.dart';
 import '../services/task_sorter.dart';
 import '../services/tgl_calculator.dart';
+import '../services/tgl_context.dart';
 import '../widgets/adaptive/adaptive_app_bar.dart';
+import '../widgets/nudge_card.dart';
 import 'task_detail_screen.dart';
 import 'task_form_screen.dart';
 import 'settings_screen.dart';
+import 'threshold_editor_screen.dart';
 
 class TaskListScreen extends StatefulWidget {
   const TaskListScreen({super.key});
@@ -24,11 +29,41 @@ class TaskListScreen extends StatefulWidget {
 
 class _TaskListScreenState extends State<TaskListScreen> {
   TaskSortOrder _sortOrder = TaskSortOrder.tgl;
+  bool _showNudge = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _showWhatsNewIfNeeded());
+    _checkNudge();
+  }
+
+  /// 転換導線ナッジ（FEAT-03）: 初回起動7日後に最大2回だけ表示する。
+  /// 表示した時点でカウントを保存する（ディスミスに依らず「表示回数」で管理）。
+  Future<void> _checkNudge() async {
+    final pref = await DatabaseService.getUserPreference();
+    final show = shouldShowNudge(
+      firstLaunchAt: pref.firstLaunchAt,
+      nudgeShownCount: pref.nudgeShownCount,
+      isUnlocked: pref.isThresholdsUnlocked,
+      now: DateTime.now(),
+    );
+    if (!show || !mounted) return;
+    pref.nudgeShownCountRaw = pref.nudgeShownCount + 1;
+    await DatabaseService.saveUserPreference(pref);
+    if (mounted) setState(() => _showNudge = true);
+  }
+
+  void _openNudgePreview() {
+    setState(() => _showNudge = false);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ThresholdEditorScreen(
+          readOnly: !PurchaseService().isUnlocked.value,
+        ),
+      ),
+    );
   }
 
   Future<void> _showWhatsNewIfNeeded() async {
@@ -126,6 +161,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
+          final ctx = TglContext.of(snapshot.data!);
           final (overdue: overdueTasks, active: activeTasks) =
               partitionAndSortTasks(snapshot.data!, _sortOrder);
 
@@ -139,15 +175,24 @@ class _TaskListScreenState extends State<TaskListScreen> {
           }
 
           final List<Widget> items = [];
+          if (_showNudge) {
+            items.add(NudgeCard(
+              key: const ValueKey('nudge-card'),
+              onTap: _openNudgePreview,
+              onDismiss: () => setState(() => _showNudge = false),
+            ));
+          }
           if (overdueTasks.isNotEmpty) {
             items.add(_SectionHeader(
               l.tglStateOverdue,
               color: const Color(0xFF7F1D1D),
               key: const ValueKey('overdue-header'),
             ));
-            items.addAll(overdueTasks.map((t) => _TaskCard(key: ValueKey(t.id), task: t)));
+            items.addAll(overdueTasks.map((t) => _TaskCard(
+                key: ValueKey(t.id), task: t, precedingLoad: ctx.loadFor(t))));
           }
-          items.addAll(activeTasks.map((t) => _TaskCard(key: ValueKey(t.id), task: t)));
+          items.addAll(activeTasks.map((t) => _TaskCard(
+              key: ValueKey(t.id), task: t, precedingLoad: ctx.loadFor(t))));
 
           return ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -163,8 +208,9 @@ class _TaskListScreenState extends State<TaskListScreen> {
 // ─── Task Card ────────────────────────────────────────────────
 
 class _TaskCard extends StatefulWidget {
-  const _TaskCard({super.key, required this.task});
+  const _TaskCard({super.key, required this.task, this.precedingLoad = 0.0});
   final Task task;
+  final double precedingLoad;
 
   @override
   State<_TaskCard> createState() => _TaskCardState();
@@ -185,7 +231,7 @@ class _TaskCardState extends State<_TaskCard> {
     final messenger = ScaffoldMessenger.of(context);
     final taskId = widget.task.id;
     await DatabaseService.markCompleted(taskId);
-    await NotificationService.resyncFromDatabase();
+    NotificationService.requestResync();
     messenger.showSnackBar(
       SnackBar(
         content: Text(l.taskCompletedMessage),
@@ -194,7 +240,7 @@ class _TaskCardState extends State<_TaskCard> {
           label: l.undoButton,
           onPressed: () async {
             await DatabaseService.undoComplete(taskId);
-            await NotificationService.resyncFromDatabase();
+            NotificationService.requestResync();
           },
         ),
       ),
@@ -215,7 +261,7 @@ class _TaskCardState extends State<_TaskCard> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     final task = widget.task;
-    final state = taskToState(task);
+    final state = taskToState(task, precedingLoad: widget.precedingLoad);
     final isHighAlert = state == TGLState.noEscape ||
         state == TGLState.war ||
         state == TGLState.overdue;

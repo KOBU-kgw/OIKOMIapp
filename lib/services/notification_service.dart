@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -9,13 +10,11 @@ import '../models/tgl_state.dart';
 import 'database_service.dart';
 import 'l10n_helper.dart';
 import 'notification_id.dart';
-import 'tgl_calculator.dart';
+import 'notification_planner.dart';
 
 class NotificationService {
   static final _plugin = FlutterLocalNotificationsPlugin();
 
-  // iOS上限64件のうち本アプリが使う最大件数
-  static const int _maxNotifications = 60;
   static const String _channelId = 'oikomi_notifications';
 
   /// 通知ON/OFF設定の SharedPreferences キー（設定画面と共有）
@@ -73,87 +72,6 @@ class NotificationService {
     final android = _plugin.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
     return await android?.canScheduleExactNotifications() ?? false;
-  }
-
-  static Future<void> scheduleNotificationsForTask(Task task) async {
-    await cancelNotificationsForTask(task.id);
-
-    if (!await _notificationsEnabled()) return;
-
-    final pending = await _plugin.pendingNotificationRequests();
-    int remaining = _maxNotifications - pending.length;
-    if (remaining <= 0) return;
-
-    // hopeless 通知: T > D（必要時間が残り時間を超える）。
-    // 同じhopelessエピソード中の再発火は抑制し、状態が解消されたらリセットする。
-    final D = task.deadline.difference(DateTime.now()).inMinutes / 60.0;
-    final isHopelessNow = D > 0 && task.requiredHours > D;
-    if (isHopelessNow) {
-      if (task.hopelessNotifiedAt == null && remaining > 0) {
-        await _scheduleNotification(
-          id: notificationId(task.id, 5),
-          task: task,
-          state: TGLState.overdue,
-          triggerTime: DateTime.now().add(const Duration(seconds: 2)),
-          isHopeless: true,
-        );
-        remaining--;
-        task.hopelessNotifiedAt = DateTime.now();
-        await DatabaseService.saveTask(task);
-      }
-    } else if (task.hopelessNotifiedAt != null) {
-      task.hopelessNotifiedAt = null;
-      await DatabaseService.saveTask(task);
-    }
-
-    final transitions = [
-      TGLState.someday,
-      TGLState.reality,
-      TGLState.noEscape,
-      TGLState.war,
-    ];
-
-    final canExact = await _canScheduleExactNotifications();
-
-    for (final (index, targetState) in transitions.indexed) {
-      if (remaining <= 0) break;
-      final triggerTime = _calculateTransitionTime(task, targetState);
-      if (triggerTime == null || !triggerTime.isAfter(DateTime.now())) continue;
-
-      await _scheduleNotification(
-        id: notificationId(task.id, index),
-        task: task,
-        state: targetState,
-        triggerTime: triggerTime,
-        useExactAlarm: canExact,
-      );
-      remaining--;
-    }
-  }
-
-  static Future<void> cancelNotificationsForTask(String taskId) async {
-    for (int i = 0; i < 6; i++) {
-      await _plugin.cancel(notificationId(taskId, i));
-    }
-  }
-
-  static DateTime? _calculateTransitionTime(Task task, TGLState state) {
-    final threshold = _thresholdFor(state);
-    if (threshold == null) return null;
-    final now = DateTime.now();
-    final hours = calendarHoursUntilThreshold(task, threshold, now: now);
-    if (hours == null) return null;
-    return now.add(Duration(milliseconds: (hours * 3600 * 1000).toInt()));
-  }
-
-  static double? _thresholdFor(TGLState state) {
-    switch (state) {
-      case TGLState.someday:  return TGLThresholds.peaceful;
-      case TGLState.reality:  return TGLThresholds.someday;
-      case TGLState.noEscape: return TGLThresholds.reality;
-      case TGLState.war:      return TGLThresholds.noEscape;
-      default:                return null;
-    }
   }
 
   static Future<void> _scheduleNotification({
@@ -228,18 +146,75 @@ class NotificationService {
     await _plugin.cancelAll();
   }
 
-  static Future<void> rescheduleAllNotifications(List<Task> tasks) async {
-    await _plugin.cancelAll();
-    for (final task in tasks) {
-      await scheduleNotificationsForTask(task);
-    }
+  // ─── 再スケジュール（v1.5: 候補収集＋予算60件・近い順優先） ───
+
+  static Timer? _resyncDebounce;
+  static bool _resyncing = false;
+  static bool _resyncQueued = false;
+
+  /// タスク操作後の再スケジュール要求（400ms debounce）。
+  /// 連続操作（Undoスナックバー猶予中など）での連打を1回にまとめる。
+  /// DB書き込みを完了させてから呼ぶこと。
+  static void requestResync() {
+    _resyncDebounce?.cancel();
+    _resyncDebounce = Timer(const Duration(milliseconds: 400), () {
+      resyncFromDatabase();
+    });
   }
 
   /// DBの現在状態を正として全タスクの通知を再同期する統一エントリポイント。
-  /// タスクの保存・完了・削除・Undo後は、個別のcancel/scheduleではなく
-  /// 必ずこれを呼ぶこと（呼び出し前にDB書き込みを完了させておく）。
+  /// 通常は [requestResync] を使う。起動時など即時実行したい場合のみ直接呼ぶ。
   static Future<void> resyncFromDatabase() async {
+    if (_resyncing) {
+      _resyncQueued = true; // 実行中に来た要求は完了後にもう一度走らせる
+      return;
+    }
+    _resyncing = true;
+    try {
+      do {
+        _resyncQueued = false;
+        await _resyncOnce();
+      } while (_resyncQueued);
+    } catch (e) {
+      debugPrint('resyncFromDatabase failed: $e');
+    } finally {
+      _resyncing = false;
+    }
+  }
+
+  static Future<void> _resyncOnce() async {
+    if (!await _notificationsEnabled()) {
+      await _plugin.cancelAll();
+      return;
+    }
+
     final tasks = await DatabaseService.getAllIncompleteTasks();
-    await rescheduleAllNotifications(tasks);
+    final now = DateTime.now();
+    final plan = planNotifications(tasks, now);
+
+    // hopeless エピソードの記録（再発火抑制・解消リセット）
+    for (final task in plan.hopelessToMark) {
+      task.hopelessNotifiedAt = now;
+      await DatabaseService.saveTask(task);
+    }
+    for (final task in plan.hopelessToClear) {
+      task.hopelessNotifiedAt = null;
+      await DatabaseService.saveTask(task);
+    }
+
+    final canExact = await _canScheduleExactNotifications();
+
+    // 候補確定後にキャンセル→予約（通知が空になる時間を最小化）
+    await _plugin.cancelAll();
+    for (final c in plan.scheduled) {
+      await _scheduleNotification(
+        id: notificationId(c.task.id, c.stateIndex),
+        task: c.task,
+        state: c.state,
+        triggerTime: c.triggerTime,
+        useExactAlarm: canExact,
+        isHopeless: c.isHopeless,
+      );
+    }
   }
 }

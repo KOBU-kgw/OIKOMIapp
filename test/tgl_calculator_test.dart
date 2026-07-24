@@ -81,6 +81,70 @@ void main() {
     });
   });
 
+  group('calculateTGL precedingLoad (v1.5 slack補正)', () {
+    // シナリオ1: precedingLoad省略/0 は v1.4 と同一
+    test('precedingLoad: 0 equals omitted (v1.4 behavior)', () {
+      final now = DateTime(2026, 1, 1);
+      final task = _makeTask(
+        deadline: now.add(const Duration(hours: 24)),
+        requiredHours: 5,
+        avoidance: 8,
+      );
+      expect(calculateTGL(task, now: now, precedingLoad: 0.0),
+          calculateTGL(task, now: now));
+    });
+
+    test('larger precedingLoad raises TGL monotonically', () {
+      final now = DateTime(2026, 1, 1);
+      final task = _makeTask(
+        deadline: now.add(const Duration(hours: 72)),
+        requiredHours: 5,
+        avoidance: 8,
+      );
+      final t0 = calculateTGL(task, now: now);
+      final t3 = calculateTGL(task, now: now, precedingLoad: 3.0);
+      final t10 = calculateTGL(task, now: now, precedingLoad: 10.0);
+      expect(t3, greaterThan(t0));
+      expect(t10, greaterThan(t3));
+    });
+
+    // シナリオ5: overdue判定は precedingLoad の影響を受けない
+    test('overdue state unaffected by precedingLoad', () {
+      final now = DateTime(2026, 1, 1);
+      final overdue = _makeTask(
+        deadline: now.subtract(const Duration(hours: 1)),
+        requiredHours: 2,
+        avoidance: 5,
+      );
+      expect(taskToState(overdue, now: now, precedingLoad: 100.0),
+          TGLState.overdue);
+      // 逆に、precedingLoadが大きくても締切前ならoverdueにはならない
+      final future = _makeTask(
+        deadline: now.add(const Duration(hours: 24)),
+        requiredHours: 1,
+        avoidance: 1,
+      );
+      expect(taskToState(future, now: now, precedingLoad: 100.0),
+          isNot(TGLState.overdue));
+    });
+
+    // シナリオ3: precedingLoad が増えると遷移トリガーが前倒しになる
+    test('solver: precedingLoad moves trigger earlier, removal moves later',
+        () {
+      final now = DateTime(2026, 1, 1);
+      final task = _makeTask(
+        deadline: now.add(const Duration(hours: 100)),
+        requiredHours: 2,
+        avoidance: 5,
+      );
+      final without = calendarHoursUntilThreshold(
+          task, TGLThresholds.reality, now: now)!;
+      final withLoad = calendarHoursUntilThreshold(
+          task, TGLThresholds.reality, now: now, precedingLoad: 10.0)!;
+      expect(withLoad, lessThan(without)); // 前倒し
+    });
+  });
+
   group('calendarHoursUntilThreshold', () {
     // 締切まで十分先の同一タスクに対し、しきい値ごとの到達時刻を比較する。
     // TGL は締切に近づくほど上がるので、しきい値が高い状態ほど遅く到達するはず。
