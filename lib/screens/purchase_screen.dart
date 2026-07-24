@@ -25,6 +25,8 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
     super.initState();
     _service.isUnlocked.addListener(_onUnlocked);
     _service.lastError.addListener(_onError);
+    // 起動時の取得に失敗していても、画面を開けば再取得する。
+    _service.refreshProduct();
   }
 
   @override
@@ -100,42 +102,85 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
             ),
             const SizedBox(height: 24),
 
-            // 購入ボタン（ストア未接続・商品未取得時は無効化して理由を表示）
+            // 購入コントロール：ローディング / 取得失敗（リトライ）/ 購入可 の3状態。
             ValueListenableBuilder(
-              valueListenable: _service.product,
-              builder: (context, product, _) {
+              valueListenable: _service.productLoading,
+              builder: (context, loading, _) {
                 return ValueListenableBuilder(
-                  valueListenable: _service.purchasePending,
-                  builder: (context, pending, _) {
-                    final canBuy = product != null && !pending;
-                    return Column(
-                      children: [
-                        FilledButton(
-                          onPressed: canBuy ? _service.buy : null,
-                          style: FilledButton.styleFrom(
-                            minimumSize: const Size.fromHeight(52),
-                          ),
-                          child: pending
-                              ? const SizedBox(
-                                  width: 22,
-                                  height: 22,
-                                  child: CircularProgressIndicator(
-                                      strokeWidth: 2.5),
-                                )
-                              : Text(
-                                  product != null
-                                      ? l.purchaseButton(product.price)
-                                      : l.purchaseUnavailable,
+                  valueListenable: _service.product,
+                  builder: (context, product, _) {
+                    return ValueListenableBuilder(
+                      valueListenable: _service.purchasePending,
+                      builder: (context, pending, _) {
+                        final Widget primary;
+                        if (loading) {
+                          // 商品情報ロード中
+                          primary = const SizedBox(
+                            height: 52,
+                            child: Center(
+                              child: SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2.5),
+                              ),
+                            ),
+                          );
+                        } else if (product == null) {
+                          // 取得失敗：理由を明示してリトライ手段を出す（死にボタンにしない）
+                          primary = Column(
+                            children: [
+                              Text(
+                                l.purchaseLoadError,
+                                style: TextStyle(
+                                    fontSize: 13, color: Colors.grey.shade700),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 12),
+                              FilledButton(
+                                onPressed: _service.refreshProduct,
+                                style: FilledButton.styleFrom(
+                                  minimumSize: const Size.fromHeight(52),
+                                ),
+                                child: Text(
+                                  l.purchaseRetry,
                                   style: const TextStyle(fontSize: 16),
                                 ),
-                        ),
-                        const SizedBox(height: 8),
-                        // 復元は常設（別端末・再インストール時の回復手段）
-                        TextButton(
-                          onPressed: pending ? null : _service.restore,
-                          child: Text(l.settingsRestorePurchase),
-                        ),
-                      ],
+                              ),
+                            ],
+                          );
+                        } else {
+                          // 購入可
+                          primary = FilledButton(
+                            onPressed: pending ? null : _service.buy,
+                            style: FilledButton.styleFrom(
+                              minimumSize: const Size.fromHeight(52),
+                            ),
+                            child: pending
+                                ? const SizedBox(
+                                    width: 22,
+                                    height: 22,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2.5),
+                                  )
+                                : Text(
+                                    l.purchaseButton(product.price),
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                          );
+                        }
+                        return Column(
+                          children: [
+                            primary,
+                            const SizedBox(height: 8),
+                            // 復元は常設（別端末・再インストール時の回復手段）
+                            TextButton(
+                              onPressed: pending ? null : _service.restore,
+                              child: Text(l.settingsRestorePurchase),
+                            ),
+                          ],
+                        );
+                      },
                     );
                   },
                 );

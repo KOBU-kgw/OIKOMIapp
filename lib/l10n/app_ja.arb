@@ -100,7 +100,13 @@
   "settingsSectionThresholdPack": "カスタム閾値",
   "settingsRestorePurchase": "購入を復元",
   "settingsCustomThresholds": "カスタム閾値",
-  "settingsCustomThresholdsLocked": "未購入",
+  "settingsCustomThresholdsLocked": "タップして購入",
+  "settingsThresholdPackPrice": "{price} · タップして解放",
+  "@settingsThresholdPackPrice": {
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
 
   "purchaseScreenTitle": "カスタム閾値パック",
   "purchaseHeadline": "「戦争」が始まるラインを、あなた仕様に。",
@@ -114,6 +120,8 @@
     }
   },
   "purchaseUnavailable": "ストアに接続できません",
+  "purchaseRetry": "再試行",
+  "purchaseLoadError": "商品情報を取得できませんでした。通信環境をご確認のうえ再試行してください。",
   "purchaseSuccess": "カスタム閾値が解放されました！",
   "purchaseRestoreDone": "購入情報を確認しました",
   "purchaseErrorGeneric": "購入処理でエラーが発生しました",

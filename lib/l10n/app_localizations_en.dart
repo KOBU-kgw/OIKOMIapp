@@ -237,7 +237,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsCustomThresholds => 'Custom Thresholds';
 
   @override
-  String get settingsCustomThresholdsLocked => 'Not purchased';
+  String get settingsCustomThresholdsLocked => 'Tap to purchase';
+
+  @override
+  String settingsThresholdPackPrice(String price) {
+    return '$price · Tap to unlock';
+  }
 
   @override
   String get purchaseScreenTitle => 'Custom Threshold Pack';
@@ -263,6 +268,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get purchaseUnavailable => 'Store is unavailable';
+
+  @override
+  String get purchaseRetry => 'Retry';
+
+  @override
+  String get purchaseLoadError =>
+      'Couldn\'t load product info. Check your connection and try again.';
 
   @override
   String get purchaseSuccess => 'Custom thresholds unlocked!';

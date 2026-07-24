@@ -100,7 +100,13 @@
   "settingsSectionThresholdPack": "Custom Thresholds",
   "settingsRestorePurchase": "Restore Purchase",
   "settingsCustomThresholds": "Custom Thresholds",
-  "settingsCustomThresholdsLocked": "Not purchased",
+  "settingsCustomThresholdsLocked": "Tap to purchase",
+  "settingsThresholdPackPrice": "{price} · Tap to unlock",
+  "@settingsThresholdPackPrice": {
+    "placeholders": {
+      "price": { "type": "String" }
+    }
+  },
 
   "purchaseScreenTitle": "Custom Threshold Pack",
   "purchaseHeadline": "Decide when your \"War\" begins.",
@@ -114,6 +120,8 @@
     }
   },
   "purchaseUnavailable": "Store is unavailable",
+  "purchaseRetry": "Retry",
+  "purchaseLoadError": "Couldn't load product info. Check your connection and try again.",
   "purchaseSuccess": "Custom thresholds unlocked!",
   "purchaseRestoreDone": "Purchases checked",
   "purchaseErrorGeneric": "Something went wrong with the purchase",

@@ -236,7 +236,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsCustomThresholds => 'カスタム閾値';
 
   @override
-  String get settingsCustomThresholdsLocked => '未購入';
+  String get settingsCustomThresholdsLocked => 'タップして購入';
+
+  @override
+  String settingsThresholdPackPrice(String price) {
+    return '$price · タップして解放';
+  }
 
   @override
   String get purchaseScreenTitle => 'カスタム閾値パック';
@@ -261,6 +266,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get purchaseUnavailable => 'ストアに接続できません';
+
+  @override
+  String get purchaseRetry => '再試行';
+
+  @override
+  String get purchaseLoadError => '商品情報を取得できませんでした。通信環境をご確認のうえ再試行してください。';
 
   @override
   String get purchaseSuccess => 'カスタム閾値が解放されました！';

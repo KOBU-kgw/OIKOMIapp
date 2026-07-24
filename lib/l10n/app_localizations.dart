@@ -539,8 +539,14 @@ abstract class AppLocalizations {
   /// No description provided for @settingsCustomThresholdsLocked.
   ///
   /// In en, this message translates to:
-  /// **'Not purchased'**
+  /// **'Tap to purchase'**
   String get settingsCustomThresholdsLocked;
+
+  /// No description provided for @settingsThresholdPackPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'{price} · Tap to unlock'**
+  String settingsThresholdPackPrice(String price);
 
   /// No description provided for @purchaseScreenTitle.
   ///
@@ -583,6 +589,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Store is unavailable'**
   String get purchaseUnavailable;
+
+  /// No description provided for @purchaseRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get purchaseRetry;
+
+  /// No description provided for @purchaseLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load product info. Check your connection and try again.'**
+  String get purchaseLoadError;
 
   /// No description provided for @purchaseSuccess.
   ///

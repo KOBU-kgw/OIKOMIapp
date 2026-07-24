@@ -96,25 +96,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ValueListenableBuilder(
                 valueListenable: PurchaseService().isUnlocked,
                 builder: (context, unlocked, _) {
-                  return ListTile(
-                    title: Text(l.settingsCustomThresholds),
-                    subtitle: unlocked
-                        ? null
-                        : Text(
-                            l.settingsCustomThresholdsLocked,
-                            style: TextStyle(
-                                fontSize: 12, color: Colors.grey.shade500),
+                  return ValueListenableBuilder(
+                    valueListenable: PurchaseService().product,
+                    builder: (context, product, _) {
+                      // 未購入時は価格つきの購入CTAを見せ、課金項目と分かるようにする。
+                      final String? subtitle = unlocked
+                          ? null
+                          : (product != null
+                              ? l.settingsThresholdPackPrice(product.price)
+                              : l.settingsCustomThresholdsLocked);
+                      return ListTile(
+                        title: Text(l.settingsCustomThresholds),
+                        subtitle: subtitle == null
+                            ? null
+                            : Text(
+                                subtitle,
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.grey.shade500),
+                              ),
+                        trailing:
+                            const Icon(Icons.chevron_right, color: Colors.grey),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => unlocked
+                                ? const ThresholdEditorScreen()
+                                : const PurchaseScreen(),
                           ),
-                    trailing:
-                        const Icon(Icons.chevron_right, color: Colors.grey),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => unlocked
-                            ? const ThresholdEditorScreen()
-                            : const PurchaseScreen(),
-                      ),
-                    ),
+                        ),
+                      );
+                    },
                   );
                 },
               ),

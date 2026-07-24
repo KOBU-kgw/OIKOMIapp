@@ -27,6 +27,9 @@ class PurchaseService {
   /// カスタム閾値パックの商品情報（取得失敗時は null）
   final ValueNotifier<ProductDetails?> product = ValueNotifier(null);
 
+  /// 商品情報を取得中か（ローディング表示用）
+  final ValueNotifier<bool> productLoading = ValueNotifier(false);
+
   /// 購入処理中か（ボタン無効化用）
   final ValueNotifier<bool> purchasePending = ValueNotifier(false);
 
@@ -46,9 +49,20 @@ class PurchaseService {
     final pref = await DatabaseService.getUserPreference();
     isUnlocked.value = pref.isThresholdsUnlocked;
 
+    await refreshProduct();
+  }
+
+  /// 商品情報を（再）取得する。購入画面のリトライボタン・画面表示時から呼べる。
+  /// ストア接続不能・商品未登録でもアプリ本体は通常動作を続ける。
+  Future<void> refreshProduct() async {
+    productLoading.value = true;
+    lastError.value = null;
     try {
       storeAvailable.value = await InAppPurchase.instance.isAvailable();
-      if (!storeAvailable.value) return;
+      if (!storeAvailable.value) {
+        product.value = null;
+        return;
+      }
 
       final response =
           await InAppPurchase.instance.queryProductDetails(AppSku.allSkus);
@@ -59,9 +73,11 @@ class PurchaseService {
           .where((p) => p.id == AppSku.unlockThresholds)
           .firstOrNull;
     } catch (e) {
-      // ストア接続不能でもアプリは通常動作を続ける
-      debugPrint('PurchaseService initialize failed: $e');
+      debugPrint('refreshProduct failed: $e');
       storeAvailable.value = false;
+      product.value = null;
+    } finally {
+      productLoading.value = false;
     }
   }
 
